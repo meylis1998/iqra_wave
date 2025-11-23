@@ -7,24 +7,11 @@ import 'package:retrofit/retrofit.dart';
 
 part 'api_client.g.dart';
 
-// Custom error logger to fix compatibility issues
-class _CustomErrorLogger implements ParseErrorLogger {
-  @override
-  void logError(Object error, StackTrace stackTrace, RequestOptions options,
-      [Response? response]) {
-    // Custom error logging - can be extended as needed
-    print('API Error: $error');
-  }
-}
-
 @lazySingleton
 @RestApi()
 abstract class ApiClient {
   @factoryMethod
-  factory ApiClient(DioClient dioClient) => _ApiClient(
-        dioClient.dio,
-        errorLogger: _CustomErrorLogger(),
-      );
+  factory ApiClient(DioClient dioClient) => _ApiClient(dioClient.dio);
 
   @GET(ApiConstants.users)
   Future<List<UserModel>> getUsers();

@@ -75,9 +75,9 @@ class AppConfig {
     switch (_environment) {
       case Environment.dev:
       case Environment.staging:
-        return 'cjBj46-wdJkUr15euqZlsTfbiC';
+        return 'cjBj46-wJJkUr15euqZ1sTfbiC'; // Fixed: wJJk (not wdJk) and euqZ1 (not euqZl)
       case Environment.prod:
-        return '4b9rxwZa80dy21.HUfmSd4fUH7';
+        return '4b9rxwZa80dy2l.HUfmSd4fUH7'; // Fixed: dy2l (not dy21)
     }
   }
 }

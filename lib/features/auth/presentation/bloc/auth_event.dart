@@ -21,10 +21,20 @@ class AuthRefreshToken extends AuthEvent {
 
 /// Event to clear all auth data (logout)
 class AuthLogout extends AuthEvent {
-  const AuthLogout();
+  const AuthLogout({this.idTokenHint});
+
+  final String? idTokenHint;
+
+  @override
+  List<Object?> get props => [idTokenHint];
 }
 
 /// Event to check current auth status
 class AuthCheckStatus extends AuthEvent {
   const AuthCheckStatus();
+}
+
+/// Event to get user information from OpenID Connect userinfo endpoint
+class AuthGetUserInfo extends AuthEvent {
+  const AuthGetUserInfo();
 }

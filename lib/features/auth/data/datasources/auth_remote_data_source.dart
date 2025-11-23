@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
@@ -5,11 +7,19 @@ import 'package:iqra_wave/core/constants/api_constants.dart';
 import 'package:iqra_wave/core/error/exceptions.dart';
 import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/data/models/token_response_model.dart';
+import 'package:iqra_wave/features/auth/data/models/user_info_model.dart';
 
 /// Abstract contract for auth remote data source
 abstract class AuthRemoteDataSource {
   /// Request access token using client credentials grant
   Future<TokenResponseModel> getAccessToken();
+
+  /// Get user information from OpenID Connect userinfo endpoint
+  /// Requires a valid access token
+  Future<UserInfoModel> getUserInfo(String accessToken);
+
+  /// Logout user by calling the OpenID Connect logout endpoint
+  Future<void> logout(String? idTokenHint);
 }
 
 /// Implementation of [AuthRemoteDataSource] using Dio
@@ -39,20 +49,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
 
+      // Using Basic Auth (client_secret_basic) as per OAuth2 RFC 6749
+      final credentials = '${AppConfig.oauthClientId}:${AppConfig.oauthClientSecret}';
+      final basicAuth = 'Basic ${base64.encode(utf8.encode(credentials))}';
+
+      AppLogger.debug('OAuth2 request - client_id: ${AppConfig.oauthClientId}');
+      AppLogger.debug('Using Basic Auth with credentials');
+
       // Prepare OAuth2 request body
       final requestData = {
         'grant_type': ApiConstants.grantTypeClientCredentials,
-        'client_id': AppConfig.oauthClientId,
-        'client_secret': AppConfig.oauthClientSecret,
+        'scope': ApiConstants.scopeContent,
       };
-
-      AppLogger.debug('OAuth2 request - client_id: ${AppConfig.oauthClientId}');
 
       final response = await oauthDio.post<Map<String, dynamic>>(
         ApiConstants.oauth2Token,
         data: requestData,
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
+          headers: {
+            ApiConstants.authorization: basicAuth,
+          },
         ),
       );
 
@@ -120,6 +137,133 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       AppLogger.error('Unexpected error during OAuth2 request', e);
       throw OAuth2Exception('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<UserInfoModel> getUserInfo(String accessToken) async {
+    try {
+      AppLogger.info('Requesting user info from ${AppConfig.oauthBaseUrl}');
+
+      // Create a separate Dio instance for OAuth requests
+      final oauthDio = Dio(
+        BaseOptions(
+          baseUrl: AppConfig.oauthBaseUrl,
+          connectTimeout: ApiConstants.connectTimeout,
+          receiveTimeout: ApiConstants.receiveTimeout,
+          headers: {
+            ApiConstants.accept: ApiConstants.applicationJson,
+            ApiConstants.authorization: '${ApiConstants.bearer} $accessToken',
+          },
+        ),
+      );
+
+      final response = await oauthDio.get<Map<String, dynamic>>(
+        ApiConstants.oauth2Userinfo,
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        AppLogger.info('User info received successfully');
+        return UserInfoModel.fromJson(response.data!);
+      } else {
+        AppLogger.error('Unexpected response: ${response.statusCode}');
+        throw OAuth2Exception(
+          'Failed to get user info: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      AppLogger.error(
+        'Userinfo request failed',
+        e,
+        e.stackTrace,
+      );
+
+      if (e.response != null) {
+        final statusCode = e.response!.statusCode;
+        final errorData = e.response!.data;
+
+        AppLogger.error('Userinfo error response: $errorData');
+
+        switch (statusCode) {
+          case 401:
+            throw AuthenticationException(
+              'Invalid or expired access token',
+            );
+          case 403:
+            throw UnauthorizedException(
+              'Access forbidden',
+            );
+          case 404:
+            throw NotFoundException(
+              'Userinfo endpoint not found',
+            );
+          case int statusCode when statusCode >= 500:
+            throw ServerException(
+              'Userinfo server error: $statusCode',
+            );
+          default:
+            throw OAuth2Exception(
+              'Userinfo request failed: $statusCode',
+            );
+        }
+      } else {
+        throw NetworkException(
+          'Network error: ${e.message}',
+        );
+      }
+    } catch (e) {
+      AppLogger.error('Unexpected error during userinfo request', e);
+      throw OAuth2Exception('Unexpected error: $e');
+    }
+  }
+
+  @override
+  Future<void> logout(String? idTokenHint) async {
+    try {
+      AppLogger.info('Logging out from ${AppConfig.oauthBaseUrl}');
+
+      // Create a separate Dio instance for OAuth requests
+      final oauthDio = Dio(
+        BaseOptions(
+          baseUrl: AppConfig.oauthBaseUrl,
+          connectTimeout: ApiConstants.connectTimeout,
+          receiveTimeout: ApiConstants.receiveTimeout,
+          followRedirects: false,
+          validateStatus: (status) {
+            // Accept 302 redirects as success
+            return status != null && (status < 400 || status == 302);
+          },
+        ),
+      );
+
+      final queryParams = <String, dynamic>{};
+      if (idTokenHint != null && idTokenHint.isNotEmpty) {
+        queryParams['id_token_hint'] = idTokenHint;
+      }
+
+      final response = await oauthDio.get(
+        ApiConstants.oauth2Logout,
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
+
+      if (response.statusCode == 302 || response.statusCode == 200) {
+        AppLogger.info('Logout successful');
+      } else {
+        AppLogger.warning('Logout returned status: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      AppLogger.error(
+        'Logout request failed',
+        e,
+        e.stackTrace,
+      );
+
+      // Don't throw error on logout - just log it
+      // The user should still be logged out locally
+      AppLogger.warning('Logout endpoint error, continuing with local logout');
+    } catch (e) {
+      AppLogger.error('Unexpected error during logout', e);
+      // Don't throw - continue with local logout
     }
   }
 }

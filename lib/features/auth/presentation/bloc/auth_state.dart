@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
+import 'package:iqra_wave/features/auth/domain/entities/user_info_entity.dart';
 
 /// Base class for all auth states
 abstract class AuthState extends Equatable {
@@ -52,4 +53,20 @@ class AuthError extends AuthState {
 /// State when token is being refreshed
 class AuthRefreshing extends AuthState {
   const AuthRefreshing();
+}
+
+/// State when user info is loaded
+class AuthUserInfoLoaded extends AuthState {
+  const AuthUserInfoLoaded(this.userInfo, this.token);
+
+  final UserInfoEntity userInfo;
+  final TokenEntity token;
+
+  @override
+  List<Object?> get props => [userInfo, token];
+}
+
+/// State when loading user info
+class AuthUserInfoLoading extends AuthState {
+  const AuthUserInfoLoading();
 }

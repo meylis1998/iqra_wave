@@ -22,7 +22,10 @@ class ApiConstants {
   static const String register = '/register';
 
   // OAuth2 endpoints
-  static const String oauth2Token = '/oauth/token';
+  static const String oauth2Token = '/oauth2/token';
+  static const String oauth2Authorize = '/oauth2/auth';
+  static const String oauth2Userinfo = '/userinfo';
+  static const String oauth2Logout = '/oauth2/sessions/logout';
 
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);
@@ -42,4 +45,13 @@ class ApiConstants {
 
   // OAuth2 grant types
   static const String grantTypeClientCredentials = 'client_credentials';
+  static const String grantTypeAuthorizationCode = 'authorization_code';
+  static const String grantTypeRefreshToken = 'refresh_token';
+
+  // OAuth2 scopes
+  static const String scopeContent = 'content';
+  static const String scopeOffline = 'offline';
+  static const String scopeOpenId = 'openid';
+  static const String scopeProfile = 'profile';
+  static const String scopeEmail = 'email';
 }

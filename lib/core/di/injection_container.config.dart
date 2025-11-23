@@ -21,6 +21,8 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
 import '../../features/auth/domain/usecases/get_access_token.dart' as _i1020;
+import '../../features/auth/domain/usecases/get_user_info.dart' as _i688;
+import '../../features/auth/domain/usecases/logout_user.dart' as _i419;
 import '../../features/auth/domain/usecases/refresh_token.dart' as _i209;
 import '../../features/auth/presentation/bloc/auth_bloc.dart' as _i797;
 import '../network/api_client.dart' as _i557;
@@ -54,6 +56,10 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()));
     gh.lazySingleton<_i1020.GetAccessToken>(
         () => _i1020.GetAccessToken(gh<_i787.AuthRepository>()));
+    gh.lazySingleton<_i419.LogoutUser>(
+        () => _i419.LogoutUser(gh<_i787.AuthRepository>()));
+    gh.lazySingleton<_i688.GetUserInfo>(
+        () => _i688.GetUserInfo(gh<_i787.AuthRepository>()));
     gh.lazySingleton<_i209.RefreshToken>(
         () => _i209.RefreshToken(gh<_i787.AuthRepository>()));
     gh.lazySingleton<_i557.ApiClient>(
@@ -61,6 +67,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i797.AuthBloc>(() => _i797.AuthBloc(
           gh<_i1020.GetAccessToken>(),
           gh<_i209.RefreshToken>(),
+          gh<_i688.GetUserInfo>(),
+          gh<_i419.LogoutUser>(),
           gh<_i787.AuthRepository>(),
         ));
     return this;

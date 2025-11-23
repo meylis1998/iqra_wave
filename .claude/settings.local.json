@@ -21,7 +21,12 @@
       "Bash(pod install)",
       "Bash(/opt/homebrew/bin/brew:*)",
       "Bash(/opt/homebrew/bin/pod:*)",
-      "Bash(flutter doctor:*)"
+      "Bash(flutter doctor:*)",
+      "Bash(flutter pub:*)",
+      "Bash(curl:*)",
+      "Bash(CLIENT_ID=\"1025e8c6-f978-4186-aed4-7b82b71ec763\")",
+      "Bash(CLIENT_SECRET=\"cjBj46-wJJkUr15euqZ1sTfbiC\")",
+      "Bash(__NEW_LINE__ curl -s -X POST \"https://prelive-oauth2.quran.foundation/oauth2/token\" )"
     ],
     "deny": [],
     "ask": []
