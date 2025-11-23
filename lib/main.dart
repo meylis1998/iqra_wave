@@ -1,3 +1,4 @@
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -37,13 +38,21 @@ class MyApp extends StatelessWidget {
       create: (context) => getIt<ThemeCubit>(),
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
-          return MaterialApp.router(
-            title: AppConfig.appName,
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            routerConfig: AppRouter.router,
+          final theme = themeMode == ThemeMode.dark
+              ? AppTheme.darkTheme
+              : AppTheme.lightTheme;
+
+          return ThemeProvider(
+            initTheme: theme,
+            duration: const Duration(milliseconds: 400),
+            builder: (_, myTheme) {
+              return MaterialApp.router(
+                title: AppConfig.appName,
+                debugShowCheckedModeBanner: false,
+                theme: myTheme,
+                routerConfig: AppRouter.router,
+              );
+            },
           );
         },
       ),

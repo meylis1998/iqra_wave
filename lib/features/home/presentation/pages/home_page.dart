@@ -1,8 +1,10 @@
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:iqra_wave/core/routes/route_names.dart';
+import 'package:iqra_wave/core/theme/app_theme.dart';
 import 'package:iqra_wave/core/theme/theme_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,19 +12,40 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ThemeSwitchingArea(
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('IqraWave'),
         actions: [
           BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
-              return IconButton(
-                icon: Icon(
-                  themeMode == ThemeMode.dark
-                      ? Icons.light_mode
-                      : Icons.dark_mode,
-                ),
-                onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+              return ThemeSwitcher(
+                builder: (context) {
+                  return IconButton(
+                    icon: Icon(
+                      themeMode == ThemeMode.dark
+                          ? Icons.light_mode
+                          : Icons.dark_mode,
+                    ),
+                    onPressed: () {
+                      final themeCubit = context.read<ThemeCubit>();
+
+                      // Determine the target theme BEFORE toggling
+                      final newTheme = themeCubit.state == ThemeMode.dark
+                          ? AppTheme.lightTheme
+                          : AppTheme.darkTheme;
+
+                      // Trigger animation with new theme and reverse option
+                      ThemeSwitcher.of(context).changeTheme(
+                        theme: newTheme,
+                        isReversed: themeCubit.state == ThemeMode.light,
+                      );
+
+                      // Update cubit state
+                      themeCubit.toggleTheme();
+                    },
+                  );
+                },
               );
             },
           ),
@@ -78,6 +101,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

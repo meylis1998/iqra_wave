@@ -71,6 +71,7 @@ dependencies:
   intl: ^0.20.1
   cached_network_image: ^3.4.1
   google_fonts: ^6.3.2
+  animated_theme_switcher: ^2.0.10
 
 dev_dependencies:
   flutter_test:
