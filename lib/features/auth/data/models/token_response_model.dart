@@ -17,6 +17,9 @@ class TokenResponseModel with _$TokenResponseModel {
     /// Number of seconds until the token expires
     @JsonKey(name: 'expires_in') required int expiresIn,
 
+    /// The scope of access granted (e.g., "content")
+    String? scope,
+
     /// Timestamp when the token was issued (calculated locally)
     /// Used to determine if the token has expired
     @Default(0) int issuedAt,

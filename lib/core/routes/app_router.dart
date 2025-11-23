@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iqra_wave/core/routes/route_names.dart';
+import 'package:iqra_wave/features/auth/presentation/pages/auth_status_page.dart';
 import 'package:iqra_wave/features/home/presentation/pages/home_page.dart';
 import 'package:iqra_wave/features/splash/presentation/pages/splash_page.dart';
 
@@ -18,12 +19,17 @@ class AppRouter {
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const SplashPage()),
       ),
-
       GoRoute(
         path: RouteNames.home,
         name: RouteNames.home,
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const HomePage()),
+      ),
+      GoRoute(
+        path: RouteNames.authStatus,
+        name: RouteNames.authStatus,
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const AuthStatusPage()),
       ),
     ],
     errorBuilder: (context, state) =>

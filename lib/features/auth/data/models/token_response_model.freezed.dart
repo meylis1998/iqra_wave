@@ -32,6 +32,9 @@ mixin _$TokenResponseModel {
   @JsonKey(name: 'expires_in')
   int get expiresIn => throw _privateConstructorUsedError;
 
+  /// The scope of access granted (e.g., "content")
+  String? get scope => throw _privateConstructorUsedError;
+
   /// Timestamp when the token was issued (calculated locally)
   /// Used to determine if the token has expired
   int get issuedAt => throw _privateConstructorUsedError;
@@ -52,6 +55,7 @@ abstract class $TokenResponseModelCopyWith<$Res> {
       {@JsonKey(name: 'access_token') String accessToken,
       @JsonKey(name: 'token_type') String tokenType,
       @JsonKey(name: 'expires_in') int expiresIn,
+      String? scope,
       int issuedAt});
 }
 
@@ -71,6 +75,7 @@ class _$TokenResponseModelCopyWithImpl<$Res, $Val extends TokenResponseModel>
     Object? accessToken = null,
     Object? tokenType = null,
     Object? expiresIn = null,
+    Object? scope = freezed,
     Object? issuedAt = null,
   }) {
     return _then(_value.copyWith(
@@ -86,6 +91,10 @@ class _$TokenResponseModelCopyWithImpl<$Res, $Val extends TokenResponseModel>
           ? _value.expiresIn
           : expiresIn // ignore: cast_nullable_to_non_nullable
               as int,
+      scope: freezed == scope
+          ? _value.scope
+          : scope // ignore: cast_nullable_to_non_nullable
+              as String?,
       issuedAt: null == issuedAt
           ? _value.issuedAt
           : issuedAt // ignore: cast_nullable_to_non_nullable
@@ -106,6 +115,7 @@ abstract class _$$TokenResponseModelImplCopyWith<$Res>
       {@JsonKey(name: 'access_token') String accessToken,
       @JsonKey(name: 'token_type') String tokenType,
       @JsonKey(name: 'expires_in') int expiresIn,
+      String? scope,
       int issuedAt});
 }
 
@@ -123,6 +133,7 @@ class __$$TokenResponseModelImplCopyWithImpl<$Res>
     Object? accessToken = null,
     Object? tokenType = null,
     Object? expiresIn = null,
+    Object? scope = freezed,
     Object? issuedAt = null,
   }) {
     return _then(_$TokenResponseModelImpl(
@@ -138,6 +149,10 @@ class __$$TokenResponseModelImplCopyWithImpl<$Res>
           ? _value.expiresIn
           : expiresIn // ignore: cast_nullable_to_non_nullable
               as int,
+      scope: freezed == scope
+          ? _value.scope
+          : scope // ignore: cast_nullable_to_non_nullable
+              as String?,
       issuedAt: null == issuedAt
           ? _value.issuedAt
           : issuedAt // ignore: cast_nullable_to_non_nullable
@@ -153,6 +168,7 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
       {@JsonKey(name: 'access_token') required this.accessToken,
       @JsonKey(name: 'token_type') required this.tokenType,
       @JsonKey(name: 'expires_in') required this.expiresIn,
+      this.scope,
       this.issuedAt = 0})
       : super._();
 
@@ -174,6 +190,10 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
   @JsonKey(name: 'expires_in')
   final int expiresIn;
 
+  /// The scope of access granted (e.g., "content")
+  @override
+  final String? scope;
+
   /// Timestamp when the token was issued (calculated locally)
   /// Used to determine if the token has expired
   @override
@@ -182,7 +202,7 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
 
   @override
   String toString() {
-    return 'TokenResponseModel(accessToken: $accessToken, tokenType: $tokenType, expiresIn: $expiresIn, issuedAt: $issuedAt)';
+    return 'TokenResponseModel(accessToken: $accessToken, tokenType: $tokenType, expiresIn: $expiresIn, scope: $scope, issuedAt: $issuedAt)';
   }
 
   @override
@@ -196,14 +216,15 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
                 other.tokenType == tokenType) &&
             (identical(other.expiresIn, expiresIn) ||
                 other.expiresIn == expiresIn) &&
+            (identical(other.scope, scope) || other.scope == scope) &&
             (identical(other.issuedAt, issuedAt) ||
                 other.issuedAt == issuedAt));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, accessToken, tokenType, expiresIn, issuedAt);
+  int get hashCode => Object.hash(
+      runtimeType, accessToken, tokenType, expiresIn, scope, issuedAt);
 
   @JsonKey(ignore: true)
   @override
@@ -225,6 +246,7 @@ abstract class _TokenResponseModel extends TokenResponseModel {
       {@JsonKey(name: 'access_token') required final String accessToken,
       @JsonKey(name: 'token_type') required final String tokenType,
       @JsonKey(name: 'expires_in') required final int expiresIn,
+      final String? scope,
       final int issuedAt}) = _$TokenResponseModelImpl;
   const _TokenResponseModel._() : super._();
 
@@ -246,6 +268,10 @@ abstract class _TokenResponseModel extends TokenResponseModel {
   /// Number of seconds until the token expires
   @JsonKey(name: 'expires_in')
   int get expiresIn;
+  @override
+
+  /// The scope of access granted (e.g., "content")
+  String? get scope;
   @override
 
   /// Timestamp when the token was issued (calculated locally)

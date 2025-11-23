@@ -10,7 +10,8 @@
       "Bash(dart analyze:*)",
       "Bash(flutter clean:*)",
       "Bash(flutter analyze:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

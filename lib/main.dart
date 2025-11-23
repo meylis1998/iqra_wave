@@ -10,6 +10,7 @@ import 'package:iqra_wave/core/theme/app_theme.dart';
 import 'package:iqra_wave/core/theme/theme_cubit.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_event.dart';
+import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,26 +50,94 @@ class MyApp extends StatelessWidget {
           create: (context) => getIt<AuthBloc>()..add(const AuthInitialize()),
         ),
       ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) {
-          final theme = themeMode == ThemeMode.dark
-              ? AppTheme.darkTheme
-              : AppTheme.lightTheme;
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          // Log auth state changes for debugging
+          if (AppConfig.enableLogging) {
+            if (state is AuthAuthenticated) {
+              debugPrint('🔐 Auth: User authenticated');
+            } else if (state is AuthError) {
+              debugPrint('🔐 Auth Error: ${state.message}');
+            } else if (state is AuthUnauthenticated) {
+              debugPrint('🔐 Auth: User unauthenticated');
+            } else if (state is AuthLoading) {
+              debugPrint('🔐 Auth: Loading...');
+            }
+          }
 
-          return ThemeProvider(
-            initTheme: theme,
-            duration: const Duration(milliseconds: 400),
-            builder: (_, myTheme) {
-              return MaterialApp.router(
-                title: AppConfig.appName,
-                debugShowCheckedModeBanner: false,
-                theme: myTheme,
-                routerConfig: AppRouter.router,
-              );
-            },
-          );
+          // Show user-friendly error notifications
+          if (state is AuthError) {
+            // Only show SnackBar if we have a scaffold messenger
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              final messenger = ScaffoldMessenger.maybeOf(context);
+              if (messenger != null) {
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.white),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _getErrorMessage(state.message),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors.red.shade700,
+                    action: SnackBarAction(
+                      label: 'Dismiss',
+                      textColor: Colors.white,
+                      onPressed: messenger.hideCurrentSnackBar,
+                    ),
+                  ),
+                );
+              }
+            });
+          }
         },
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            final theme = themeMode == ThemeMode.dark
+                ? AppTheme.darkTheme
+                : AppTheme.lightTheme;
+
+            return ThemeProvider(
+              initTheme: theme,
+              duration: const Duration(milliseconds: 400),
+              builder: (_, myTheme) {
+                return MaterialApp.router(
+                  title: AppConfig.appName,
+                  debugShowCheckedModeBanner: false,
+                  theme: myTheme,
+                  routerConfig: AppRouter.router,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
+  }
+
+  /// Convert technical error messages to user-friendly ones
+  String _getErrorMessage(String technicalMessage) {
+    if (technicalMessage.toLowerCase().contains('network') ||
+        technicalMessage.toLowerCase().contains('internet')) {
+      return 'No internet connection. Please check your network.';
+    }
+    if (technicalMessage.toLowerCase().contains('oauth') ||
+        technicalMessage.toLowerCase().contains('authentication')) {
+      return 'Authentication service unavailable. Please try again.';
+    }
+    if (technicalMessage.toLowerCase().contains('timeout')) {
+      return 'Request timed out. Please try again.';
+    }
+    if (technicalMessage.toLowerCase().contains('server')) {
+      return 'Server error. Please try again later.';
+    }
+    return 'Authentication error occurred';
   }
 }
