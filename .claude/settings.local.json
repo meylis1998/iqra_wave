@@ -11,7 +11,17 @@
       "Bash(flutter clean:*)",
       "Bash(flutter analyze:*)",
       "Bash(dir:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(ruby:*)",
+      "Bash(sudo gem install:*)",
+      "Bash(gem install:*)",
+      "Bash(echo:*)",
+      "Bash(export PATH=\"$HOME/.local/share/gem/ruby/3.4.0/bin:$PATH\")",
+      "Bash(pod --version:*)",
+      "Bash(pod install)",
+      "Bash(/opt/homebrew/bin/brew:*)",
+      "Bash(/opt/homebrew/bin/pod:*)",
+      "Bash(flutter doctor:*)"
     ],
     "deny": [],
     "ask": []
