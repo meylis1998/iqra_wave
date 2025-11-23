@@ -35,4 +35,49 @@ class AppConfig {
   }
 
   static bool get enableLogging => _environment != Environment.prod;
+
+  // Quran.Foundation OAuth2 Configuration
+  static String get oauthBaseUrl {
+    switch (_environment) {
+      case Environment.dev:
+        return 'https://prelive-oauth2.quran.foundation';
+      case Environment.staging:
+        return 'https://prelive-oauth2.quran.foundation';
+      case Environment.prod:
+        return 'https://oauth2.quran.foundation';
+    }
+  }
+
+  static String get quranApiBaseUrl {
+    switch (_environment) {
+      case Environment.dev:
+        return 'https://prelive-api.quran.foundation';
+      case Environment.staging:
+        return 'https://prelive-api.quran.foundation';
+      case Environment.prod:
+        return 'https://api.quran.foundation';
+    }
+  }
+
+  static String get oauthClientId {
+    switch (_environment) {
+      case Environment.dev:
+      case Environment.staging:
+        return '1025e8c6-f978-4186-aed4-7b82b71ec763';
+      case Environment.prod:
+        return '4d57db73-0de3-4ff9-8fc5-8ff5ecf51a08';
+    }
+  }
+
+  // NOTE: In production, this should be stored in secure environment variables
+  // or retrieved from a secure backend service, never hardcoded
+  static String get oauthClientSecret {
+    switch (_environment) {
+      case Environment.dev:
+      case Environment.staging:
+        return 'cjBj46-wdJkUr15euqZlsTfbiC';
+      case Environment.prod:
+        return '4b9rxwZa80dy21.HUfmSd4fUH7';
+    }
+  }
 }

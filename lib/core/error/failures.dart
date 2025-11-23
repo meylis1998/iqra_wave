@@ -40,3 +40,11 @@ class NotFoundFailure extends Failure {
 class UnexpectedFailure extends Failure {
   const UnexpectedFailure([super.message = 'An unexpected error occurred']);
 }
+
+class TokenExpiredFailure extends Failure {
+  const TokenExpiredFailure([super.message = 'Access token has expired']);
+}
+
+class OAuth2Failure extends Failure {
+  const OAuth2Failure([super.message = 'OAuth2 authentication failed']);
+}

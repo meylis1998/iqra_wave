@@ -9,7 +9,8 @@
       "Bash(flutter pub upgrade:*)",
       "Bash(dart analyze:*)",
       "Bash(flutter clean:*)",
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

@@ -60,3 +60,21 @@ class NotFoundException implements Exception {
   @override
   String toString() => message;
 }
+
+class TokenExpiredException implements Exception {
+
+  TokenExpiredException([this.message = 'Access token has expired']);
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class OAuth2Exception implements Exception {
+
+  OAuth2Exception([this.message = 'OAuth2 authentication failed']);
+  final String message;
+
+  @override
+  String toString() => message;
+}
