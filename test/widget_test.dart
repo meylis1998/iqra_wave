@@ -18,5 +18,8 @@ void main() {
 
     // Verify that the app icon is displayed
     expect(find.byIcon(Icons.flutter_dash), findsOneWidget);
+
+    // Pump frames up to the navigation call (but don't wait for it to execute)
+    await tester.pump(const Duration(milliseconds: 100));
   });
 }

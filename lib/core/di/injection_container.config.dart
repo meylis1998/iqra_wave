@@ -1,4 +1,3 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -20,20 +19,22 @@ import '../network/network_info.dart' as _i932;
 import '../theme/theme_cubit.dart' as _i611;
 
 extension GetItInjectableX on _i174.GetIt {
-  // initializes the registration of main-scope dependencies inside of GetIt
+// initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
   }) {
-    final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final gh = _i526.GetItHelper(
+      this,
+      environment,
+      environmentFilter,
+    );
     gh.factory<_i611.ThemeCubit>(() => _i611.ThemeCubit());
     gh.lazySingleton<_i667.DioClient>(() => _i667.DioClient());
     gh.lazySingleton<_i932.NetworkInfo>(
-      () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()),
-    );
+        () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()));
     gh.lazySingleton<_i557.ApiClient>(
-      () => _i557.ApiClient(gh<_i667.DioClient>()),
-    );
+        () => _i557.ApiClient(gh<_i667.DioClient>()));
     return this;
   }
 }
