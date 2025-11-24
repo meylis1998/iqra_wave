@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "iqra_wave",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "iqra_wave (profile mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "iqra_wave (release mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    }
+  ]
+}
