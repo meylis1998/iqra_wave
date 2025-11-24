@@ -33,8 +33,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<TokenResponseModel> getAccessToken() async {
     try {
-      AppLogger.info('Requesting OAuth2 access token from ${AppConfig.oauthBaseUrl}');
-
       // Create a separate Dio instance for OAuth requests to avoid interceptor loops
       final oauthDio = Dio(
         BaseOptions(
@@ -52,9 +50,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Using Basic Auth (client_secret_basic) as per OAuth2 RFC 6749
       final credentials = '${AppConfig.oauthClientId}:${AppConfig.oauthClientSecret}';
       final basicAuth = 'Basic ${base64.encode(utf8.encode(credentials))}';
-
-      AppLogger.debug('OAuth2 request - client_id: ${AppConfig.oauthClientId}');
-      AppLogger.debug('Using Basic Auth with credentials');
 
       // Prepare OAuth2 request body
       final requestData = {
@@ -74,8 +69,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        AppLogger.info('Access token received successfully');
-
         // Add issued timestamp
         final tokenData = {
           ...response.data!,
@@ -84,23 +77,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
         return TokenResponseModel.fromJson(tokenData);
       } else {
-        AppLogger.error('Unexpected response: ${response.statusCode}');
         throw OAuth2Exception(
           'Failed to get access token: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
-      AppLogger.error(
-        'OAuth2 request failed',
-        e,
-        e.stackTrace,
-      );
-
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
         final errorData = e.response!.data;
-
-        AppLogger.error('OAuth2 error response: $errorData');
 
         switch (statusCode) {
           case 400:
@@ -119,7 +103,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             throw NotFoundException(
               'OAuth2 endpoint not found',
             );
-          case int statusCode when statusCode >= 500:
+          case final int statusCode when statusCode >= 500:
             throw ServerException(
               'OAuth2 server error: $statusCode',
             );
@@ -135,7 +119,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } catch (e) {
-      AppLogger.error('Unexpected error during OAuth2 request', e);
       throw OAuth2Exception('Unexpected error: $e');
     }
   }
@@ -143,8 +126,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserInfoModel> getUserInfo(String accessToken) async {
     try {
-      AppLogger.info('Requesting user info from ${AppConfig.oauthBaseUrl}');
-
       // Create a separate Dio instance for OAuth requests
       final oauthDio = Dio(
         BaseOptions(
@@ -163,26 +144,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        AppLogger.info('User info received successfully');
         return UserInfoModel.fromJson(response.data!);
       } else {
-        AppLogger.error('Unexpected response: ${response.statusCode}');
         throw OAuth2Exception(
           'Failed to get user info: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
-      AppLogger.error(
-        'Userinfo request failed',
-        e,
-        e.stackTrace,
-      );
-
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
         final errorData = e.response!.data;
-
-        AppLogger.error('Userinfo error response: $errorData');
 
         switch (statusCode) {
           case 401:
@@ -197,7 +168,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             throw NotFoundException(
               'Userinfo endpoint not found',
             );
-          case int statusCode when statusCode >= 500:
+          case final int statusCode when statusCode >= 500:
             throw ServerException(
               'Userinfo server error: $statusCode',
             );
@@ -212,7 +183,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } catch (e) {
-      AppLogger.error('Unexpected error during userinfo request', e);
       throw OAuth2Exception('Unexpected error: $e');
     }
   }
@@ -220,8 +190,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> logout(String? idTokenHint) async {
     try {
-      AppLogger.info('Logging out from ${AppConfig.oauthBaseUrl}');
-
       // Create a separate Dio instance for OAuth requests
       final oauthDio = Dio(
         BaseOptions(
@@ -245,24 +213,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ApiConstants.oauth2Logout,
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
-
-      if (response.statusCode == 302 || response.statusCode == 200) {
-        AppLogger.info('Logout successful');
-      } else {
-        AppLogger.warning('Logout returned status: ${response.statusCode}');
-      }
     } on DioException catch (e) {
-      AppLogger.error(
-        'Logout request failed',
-        e,
-        e.stackTrace,
-      );
-
       // Don't throw error on logout - just log it
       // The user should still be logged out locally
-      AppLogger.warning('Logout endpoint error, continuing with local logout');
     } catch (e) {
-      AppLogger.error('Unexpected error during logout', e);
       // Don't throw - continue with local logout
     }
   }

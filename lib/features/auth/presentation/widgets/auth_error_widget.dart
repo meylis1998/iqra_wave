@@ -109,7 +109,7 @@ class AuthErrorWidget extends StatelessWidget {
 
   _ErrorInfo _getErrorInfo() {
     if (failure is NetworkFailure) {
-      return _ErrorInfo(
+      return const _ErrorInfo(
         icon: Icons.wifi_off,
         color: Colors.orange,
         title: 'No Internet Connection',
@@ -119,7 +119,7 @@ class AuthErrorWidget extends StatelessWidget {
     }
 
     if (failure is OAuth2Failure) {
-      return _ErrorInfo(
+      return const _ErrorInfo(
         icon: Icons.cloud_off,
         color: Colors.red,
         title: 'Authentication Server Unavailable',
@@ -129,7 +129,7 @@ class AuthErrorWidget extends StatelessWidget {
     }
 
     if (failure is TokenExpiredFailure) {
-      return _ErrorInfo(
+      return const _ErrorInfo(
         icon: Icons.timer_off,
         color: Colors.blue,
         title: 'Session Expired',
@@ -139,7 +139,7 @@ class AuthErrorWidget extends StatelessWidget {
     }
 
     if (failure is ServerFailure) {
-      return _ErrorInfo(
+      return const _ErrorInfo(
         icon: Icons.error_outline,
         color: Colors.red,
         title: 'Server Error',

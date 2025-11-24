@@ -52,19 +52,6 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          // Log auth state changes for debugging
-          if (AppConfig.enableLogging) {
-            if (state is AuthAuthenticated) {
-              debugPrint('🔐 Auth: User authenticated');
-            } else if (state is AuthError) {
-              debugPrint('🔐 Auth Error: ${state.message}');
-            } else if (state is AuthUnauthenticated) {
-              debugPrint('🔐 Auth: User unauthenticated');
-            } else if (state is AuthLoading) {
-              debugPrint('🔐 Auth: Loading...');
-            }
-          }
-
           // Show user-friendly error notifications
           if (state is AuthError) {
             // Only show SnackBar if we have a scaffold messenger

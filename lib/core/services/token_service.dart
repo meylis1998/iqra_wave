@@ -37,12 +37,7 @@ class TokenService {
         key: StorageConstants.quranFoundationClientId,
         value: AppConfig.oauthClientId,
       );
-
-      AppLogger.info(
-        'Token stored successfully. Expires at: ${updatedToken.expiryDateTime}',
-      );
     } catch (e) {
-      AppLogger.error('Failed to store token', e);
       rethrow;
     }
   }
@@ -56,7 +51,6 @@ class TokenService {
       );
       return token;
     } catch (e) {
-      AppLogger.error('Failed to retrieve token', e);
       return null;
     }
   }
@@ -70,7 +64,6 @@ class TokenService {
       );
       return expiryStr != null ? int.tryParse(expiryStr) : null;
     } catch (e) {
-      AppLogger.error('Failed to retrieve token expiry', e);
       return null;
     }
   }
@@ -82,7 +75,6 @@ class TokenService {
         key: StorageConstants.quranFoundationClientId,
       );
     } catch (e) {
-      AppLogger.error('Failed to retrieve client ID', e);
       return null;
     }
   }
@@ -97,13 +89,8 @@ class TokenService {
       final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final isExpired = now >= (expiry - _tokenBufferSeconds);
 
-      if (isExpired) {
-        AppLogger.info('Token is expired or will expire soon');
-      }
-
       return isExpired;
     } catch (e) {
-      AppLogger.error('Failed to check token expiry', e);
       return true;
     }
   }
@@ -126,9 +113,7 @@ class TokenService {
         _secureStorage.delete(key: StorageConstants.quranFoundationTokenExpiry),
         _secureStorage.delete(key: StorageConstants.quranFoundationClientId),
       ]);
-      AppLogger.info('All tokens cleared successfully');
     } catch (e) {
-      AppLogger.error('Failed to clear tokens', e);
       rethrow;
     }
   }
@@ -145,7 +130,6 @@ class TokenService {
 
       return remaining > 0 ? remaining : null;
     } catch (e) {
-      AppLogger.error('Failed to calculate time until expiry', e);
       return null;
     }
   }

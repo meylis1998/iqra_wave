@@ -16,6 +16,6 @@ class RefreshToken implements UseCase<TokenEntity, NoParams> {
 
   @override
   Future<Either<Failure, TokenEntity>> call(NoParams params) async {
-    return await _repository.refreshToken();
+    return _repository.refreshToken();
   }
 }

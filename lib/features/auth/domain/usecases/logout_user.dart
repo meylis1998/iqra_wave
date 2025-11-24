@@ -26,6 +26,6 @@ class LogoutUser implements UseCase<Unit, LogoutParams> {
 
   @override
   Future<Either<Failure, Unit>> call(LogoutParams params) async {
-    return await _repository.logout(idTokenHint: params.idTokenHint);
+    return _repository.logout(idTokenHint: params.idTokenHint);
   }
 }

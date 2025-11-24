@@ -45,49 +45,41 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
-    AppLogger.info('Initializing authentication');
 
     try {
       // Check if valid token already exists
       final hasValidToken = await _authRepository.hasValidToken();
 
       if (hasValidToken) {
-        AppLogger.info('Valid token exists, user is authenticated');
         // We don't have the token entity here, so we need to get it
         // For now, we'll request a fresh token to ensure we have the entity
         final result = await _getAccessToken(NoParams());
 
         result.fold(
           (failure) {
-            AppLogger.error('Failed to get token: ${failure.message}');
             _currentToken = null;
             emit(AuthUnauthenticated(failure.message));
           },
           (token) {
-            AppLogger.info('Authentication successful');
             _currentToken = token;
             emit(AuthAuthenticated(token));
           },
         );
       } else {
-        AppLogger.info('No valid token, requesting new token');
         final result = await _getAccessToken(NoParams());
 
         result.fold(
           (failure) {
-            AppLogger.error('Failed to get access token: ${failure.message}');
             _currentToken = null;
             emit(AuthError(failure.message));
           },
           (token) {
-            AppLogger.info('Access token obtained successfully');
             _currentToken = token;
             emit(AuthAuthenticated(token));
           },
         );
       }
     } catch (e) {
-      AppLogger.error('Error during auth initialization', e);
       emit(AuthError('Failed to initialize authentication: $e'));
     }
   }
@@ -98,25 +90,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthRefreshing());
-    AppLogger.info('Refreshing access token');
 
     try {
       final result = await _refreshToken(NoParams());
 
       result.fold(
         (failure) {
-          AppLogger.error('Failed to refresh token: ${failure.message}');
           _currentToken = null;
           emit(AuthError(failure.message));
         },
         (token) {
-          AppLogger.info('Token refreshed successfully');
           _currentToken = token;
           emit(AuthAuthenticated(token));
         },
       );
     } catch (e) {
-      AppLogger.error('Error during token refresh', e);
       emit(AuthError('Failed to refresh token: $e'));
     }
   }
@@ -127,7 +115,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
-    AppLogger.info('Logging out');
 
     try {
       final result = await _logoutUser(
@@ -136,19 +123,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) {
-          AppLogger.warning('Logout API error: ${failure.message}');
           // Still emit unauthenticated even if server call failed
           _currentToken = null;
           emit(const AuthUnauthenticated('Logged out (offline)'));
         },
         (_) {
-          AppLogger.info('Logout successful');
           _currentToken = null;
           emit(const AuthUnauthenticated('Logged out successfully'));
         },
       );
     } catch (e) {
-      AppLogger.error('Error during logout', e);
       _currentToken = null;
       emit(const AuthUnauthenticated('Logged out (error)'));
     }
@@ -159,19 +143,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthCheckStatus event,
     Emitter<AuthState> emit,
   ) async {
-    AppLogger.info('Checking auth status');
-
     try {
       final hasValidToken = await _authRepository.hasValidToken();
 
       if (hasValidToken) {
-        AppLogger.info('Valid token exists');
         // Get fresh token to have the entity
         final result = await _getAccessToken(NoParams());
 
         result.fold(
           (failure) {
-            AppLogger.error('Failed to get token: ${failure.message}');
             _currentToken = null;
             emit(AuthUnauthenticated(failure.message));
           },
@@ -181,11 +161,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           },
         );
       } else {
-        AppLogger.info('No valid token');
         emit(const AuthUnauthenticated('No valid token'));
       }
     } catch (e) {
-      AppLogger.error('Error checking auth status', e);
       emit(AuthError('Failed to check auth status: $e'));
     }
   }
@@ -196,7 +174,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthUserInfoLoading());
-    AppLogger.info('Getting user info');
 
     try {
       // Ensure we have a valid token first
@@ -204,7 +181,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final tokenResult = await _getAccessToken(NoParams());
         await tokenResult.fold(
           (failure) async {
-            AppLogger.error('Failed to get token: ${failure.message}');
             emit(AuthError('Failed to authenticate: ${failure.message}'));
             return;
           },
@@ -224,16 +200,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) {
-          AppLogger.error('Failed to get user info: ${failure.message}');
           emit(AuthError(failure.message));
         },
         (userInfo) {
-          AppLogger.info('User info obtained: ${userInfo.email}');
           emit(AuthUserInfoLoaded(userInfo, _currentToken!));
         },
       );
     } catch (e) {
-      AppLogger.error('Error getting user info', e);
       emit(AuthError('Failed to get user info: $e'));
     }
   }

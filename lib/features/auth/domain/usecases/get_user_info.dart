@@ -15,6 +15,6 @@ class GetUserInfo implements UseCase<UserInfoEntity, NoParams> {
 
   @override
   Future<Either<Failure, UserInfoEntity>> call(NoParams params) async {
-    return await _repository.getUserInfo();
+    return _repository.getUserInfo();
   }
 }
