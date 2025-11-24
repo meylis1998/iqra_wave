@@ -5,8 +5,6 @@ class SecretsManager {
   bool _isInitialized = false;
   bool _dotenvLoaded = false;
 
-  /// Initialize the secrets manager
-  /// Must be called before any secrets are accessed
   Future<void> initialize({String? envFile}) async {
     if (_isInitialized) {
       AppLogger.debug('SecretsManager already initialized');

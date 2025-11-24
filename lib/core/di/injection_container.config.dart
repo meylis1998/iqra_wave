@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -32,33 +32,38 @@ import '../network/dio_client.dart' as _i667;
 import '../network/network_info.dart' as _i932;
 import '../security/device_security_service.dart' as _i1068;
 import '../services/biometric_service.dart' as _i374;
-import '../services/observability_service.dart' as _i1050;
-import '../services/performance_monitor.dart' as _i759;
 import '../services/preferences_service.dart' as _i627;
 import '../services/token_refresh_manager.dart' as _i251;
 import '../services/token_refresh_scheduler.dart' as _i405;
 import '../services/token_service.dart' as _i227;
 import '../theme/theme_cubit.dart' as _i611;
+import 'injection_container.dart' as _i809;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
-  _i174.GetIt init({
+  Future<_i174.GetIt> init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
-  }) {
+  }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    final externalDependenciesModule = _$ExternalDependenciesModule();
     gh.factory<_i611.ThemeCubit>(() => _i611.ThemeCubit());
+    gh.lazySingleton<_i361.Dio>(() => externalDependenciesModule.dio);
+    gh.lazySingleton<_i161.InternetConnection>(
+      () => externalDependenciesModule.internetConnection,
+    );
+    gh.lazySingleton<_i558.FlutterSecureStorage>(
+      () => externalDependenciesModule.secureStorage,
+    );
+    await gh.lazySingletonAsync<_i460.SharedPreferences>(
+      () => externalDependenciesModule.sharedPreferences,
+      preResolve: true,
+    );
+    gh.lazySingleton<_i667.DioClient>(() => _i667.DioClient());
     gh.lazySingleton<_i1068.DeviceSecurityService>(
       () => _i1068.DeviceSecurityService(),
     );
-    gh.lazySingleton<_i667.DioClient>(() => _i667.DioClient());
     gh.lazySingleton<_i374.BiometricService>(() => _i374.BiometricService());
-    gh.lazySingleton<_i759.PerformanceMonitor>(
-      () => _i759.PerformanceMonitor(),
-    );
-    gh.lazySingleton<_i1050.ObservabilityService>(
-      () => _i1050.ObservabilityService(),
-    );
     gh.lazySingleton<_i627.PreferencesService>(
       () => _i627.PreferencesService(gh<_i460.SharedPreferences>()),
     );
@@ -80,11 +85,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1020.GetAccessToken>(
       () => _i1020.GetAccessToken(gh<_i787.AuthRepository>()),
     );
-    gh.lazySingleton<_i419.LogoutUser>(
-      () => _i419.LogoutUser(gh<_i787.AuthRepository>()),
-    );
     gh.lazySingleton<_i688.GetUserInfo>(
       () => _i688.GetUserInfo(gh<_i787.AuthRepository>()),
+    );
+    gh.lazySingleton<_i419.LogoutUser>(
+      () => _i419.LogoutUser(gh<_i787.AuthRepository>()),
     );
     gh.lazySingleton<_i209.RefreshToken>(
       () => _i209.RefreshToken(gh<_i787.AuthRepository>()),
@@ -114,3 +119,5 @@ extension GetItInjectableX on _i174.GetIt {
     return this;
   }
 }
+
+class _$ExternalDependenciesModule extends _i809.ExternalDependenciesModule {}

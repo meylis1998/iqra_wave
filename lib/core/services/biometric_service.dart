@@ -24,7 +24,7 @@ class BiometricService {
       );
 
       return isAvailable;
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       AppLogger.error('Failed to check biometric availability', e, stackTrace);
       return false;
     }
@@ -40,7 +40,7 @@ class BiometricService {
       );
 
       return biometrics;
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       AppLogger.error('Failed to get available biometrics', e, stackTrace);
       return [];
     }
@@ -49,9 +49,9 @@ class BiometricService {
   /// Authenticate user with biometrics
   Future<bool> authenticate({
     required String reason,
-    bool useErrorDialogs = true,
-    bool stickyAuth = true,
     bool biometricOnly = true,
+    bool sensitiveTransaction = true,
+    bool persistAcrossBackgrounding = true,
   }) async {
     try {
       // Check if biometrics are available first
@@ -66,11 +66,9 @@ class BiometricService {
 
       final authenticated = await _auth.authenticate(
         localizedReason: reason,
-        options: AuthenticationOptions(
-          useErrorDialogs: useErrorDialogs,
-          stickyAuth: stickyAuth,
-          biometricOnly: biometricOnly,
-        ),
+        biometricOnly: biometricOnly,
+        sensitiveTransaction: sensitiveTransaction,
+        persistAcrossBackgrounding: persistAcrossBackgrounding,
       );
 
       if (authenticated) {
@@ -80,7 +78,7 @@ class BiometricService {
       }
 
       return authenticated;
-    } catch (e, stackTrace) {
+    } on Exception catch (e, stackTrace) {
       AppLogger.error('Biometric authentication error', e, stackTrace);
       return false;
     }
@@ -91,25 +89,20 @@ class BiometricService {
     try {
       await _auth.stopAuthentication();
       AppLogger.debug('Biometric authentication stopped');
-    } catch (e) {
+    } on Exception catch (e) {
       AppLogger.error('Failed to stop biometric authentication', e);
     }
   }
 
   /// Get human-readable name for biometric type
   String getBiometricTypeName(BiometricType type) {
-    switch (type) {
-      case BiometricType.face:
-        return 'Face ID';
-      case BiometricType.fingerprint:
-        return 'Fingerprint';
-      case BiometricType.iris:
-        return 'Iris';
-      case BiometricType.strong:
-        return 'Strong Biometric';
-      case BiometricType.weak:
-        return 'Weak Biometric';
-    }
+    return switch (type) {
+      BiometricType.face => 'Face ID',
+      BiometricType.fingerprint => 'Fingerprint',
+      BiometricType.iris => 'Iris',
+      BiometricType.strong => 'Strong Biometric',
+      BiometricType.weak => 'Weak Biometric',
+    };
   }
 
   /// Get description of available biometrics for UI

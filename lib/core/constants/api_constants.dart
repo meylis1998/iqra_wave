@@ -1,9 +1,4 @@
 class ApiConstants {
-  // Legacy API URLs (JSONPlaceholder - for testing)
-  static const String devBaseUrl = 'https://jsonplaceholder.typicode.com';
-  static const String stagingBaseUrl = 'https://jsonplaceholder.typicode.com';
-  static const String prodBaseUrl = 'https://jsonplaceholder.typicode.com';
-
   // Quran.Foundation OAuth2 URLs
   static const String devOAuthUrl = 'https://prelive-oauth2.quran.foundation';
   static const String stagingOAuthUrl = 'https://prelive-oauth2.quran.foundation';
@@ -13,13 +8,6 @@ class ApiConstants {
   static const String devQuranApiUrl = 'https://apis-prelive.quran.foundation';
   static const String stagingQuranApiUrl = 'https://apis-prelive.quran.foundation';
   static const String prodQuranApiUrl = 'https://apis.quran.foundation';
-
-  // Legacy endpoints
-  static const String posts = '/posts';
-  static const String users = '/users';
-  static const String comments = '/comments';
-  static const String login = '/login';
-  static const String register = '/register';
 
   // OAuth2 endpoints
   static const String oauth2Token = '/oauth2/token';

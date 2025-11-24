@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
-import 'package:iqra_wave/core/constants/api_constants.dart';
-import 'package:iqra_wave/core/models/user_model.dart';
 import 'package:iqra_wave/core/network/dio_client.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -15,9 +13,5 @@ abstract class ApiClient {
   factory ApiClient(DioClient dioClient) =>
       _ApiClient(dioClient.dio, baseUrl: AppConfig.quranApiBaseUrl);
 
-  @GET(ApiConstants.users)
-  Future<List<UserModel>> getUsers();
-
-  @GET('${ApiConstants.users}/{id}')
-  Future<UserModel> getUser(@Path('id') int id);
+  // Add Quran.Foundation API endpoints here as needed
 }

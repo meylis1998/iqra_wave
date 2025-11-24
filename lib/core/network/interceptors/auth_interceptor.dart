@@ -83,11 +83,6 @@ class AuthInterceptor extends Interceptor {
       return true;
     }
 
-    if (options.path.contains(ApiConstants.login) ||
-        options.path.contains(ApiConstants.register)) {
-      return true;
-    }
-
     return false;
   }
 

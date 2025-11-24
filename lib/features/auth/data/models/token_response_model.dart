@@ -7,20 +7,16 @@ part 'token_response_model.g.dart';
 class TokenResponseModel with _$TokenResponseModel {
   const factory TokenResponseModel({
     @JsonKey(name: 'access_token') required String accessToken,
-
     @JsonKey(name: 'token_type') required String tokenType,
-
     @JsonKey(name: 'expires_in') required int expiresIn,
-
     String? scope,
-
     @Default(0) int issuedAt,
   }) = _TokenResponseModel;
 
+  const TokenResponseModel._();
+
   factory TokenResponseModel.fromJson(Map<String, dynamic> json) =>
       _$TokenResponseModelFromJson(json);
-
-  const TokenResponseModel._();
 
   bool isExpired({int bufferSeconds = 300}) {
     if (issuedAt == 0) return true;

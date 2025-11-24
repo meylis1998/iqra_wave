@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,8 +9,6 @@ import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/configs/secrets_manager.dart';
 import 'package:iqra_wave/core/di/injection_container.dart';
 import 'package:iqra_wave/core/routes/app_router.dart';
-import 'package:iqra_wave/core/services/observability_service.dart';
-import 'package:iqra_wave/core/services/performance_monitor.dart';
 import 'package:iqra_wave/core/services/token_refresh_scheduler.dart';
 import 'package:iqra_wave/core/theme/app_theme.dart';
 import 'package:iqra_wave/core/theme/theme_cubit.dart';
@@ -25,7 +20,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async {
+Future<void> main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -34,22 +29,6 @@ void main() async {
       await secretsManager.initialize();
 
       AppConfig.initialize(secretsManager);
-
-      try {
-        await Firebase.initializeApp();
-
-        if (AppConfig.enableCrashlytics) {
-          FlutterError.onError =
-              FirebaseCrashlytics.instance.recordFlutterFatalError;
-          PlatformDispatcher.instance.onError = (error, stack) {
-            FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-            return true;
-          };
-          AppLogger.info('Firebase Crashlytics enabled');
-        }
-      } catch (e) {
-        AppLogger.warning('Firebase not configured: $e');
-      }
 
       HydratedBloc.storage = await HydratedStorage.build(
         storageDirectory: HydratedStorageDirectory(
@@ -64,8 +43,6 @@ void main() async {
         ..registerLazySingleton(() => secretsManager);
 
       await configureDependencies();
-
-      await _initializeServices();
 
       final sentryDsn = AppConfig.sentryDsn;
       if (sentryDsn != null && sentryDsn.isNotEmpty) {
@@ -99,20 +76,6 @@ void main() async {
   );
 }
 
-Future<void> _initializeServices() async {
-  try {
-    final observability = getIt<ObservabilityService>();
-    await observability.initialize();
-
-    final performanceMonitor = getIt<PerformanceMonitor>();
-    await performanceMonitor.initialize();
-
-    AppLogger.info('All services initialized successfully');
-  } catch (e, stackTrace) {
-    AppLogger.error('Failed to initialize services', e, stackTrace);
-  }
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -130,7 +93,6 @@ class MyApp extends StatelessWidget {
             bloc.stream.listen((state) {
               if (state is AuthAuthenticated) {
                 getIt<TokenRefreshScheduler>().startProactiveRefresh();
-                _trackAuthEvent('authenticated');
               } else if (state is AuthUnauthenticated) {
                 getIt<TokenRefreshScheduler>().stopProactiveRefresh();
               }
@@ -145,8 +107,6 @@ class MyApp extends StatelessWidget {
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            _trackAuthEvent('error', error: state.message);
-
             WidgetsBinding.instance.addPostFrameCallback((_) {
               final messenger = ScaffoldMessenger.maybeOf(context);
               if (messenger != null) {
@@ -217,18 +177,5 @@ class MyApp extends StatelessWidget {
       return 'Server error. Please try again later.';
     }
     return 'Authentication error occurred';
-  }
-
-  void _trackAuthEvent(String event, {String? error}) {
-    try {
-      final observability = getIt<ObservabilityService>();
-      if (error != null) {
-        observability.trackAuthError(event, error, null);
-      } else {
-        observability.trackAuthEvent(event);
-      }
-    } catch (e) {
-      AppLogger.debug('Failed to track auth event: $e');
-    }
   }
 }
