@@ -6,7 +6,7 @@ part 'user_info_model.g.dart';
 
 
 @freezed
-class UserInfoModel with _$UserInfoModel {
+abstract class UserInfoModel with _$UserInfoModel {
   const factory UserInfoModel({
     required String email,
     @JsonKey(name: 'first_name') String? firstName,

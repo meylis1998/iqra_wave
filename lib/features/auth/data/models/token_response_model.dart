@@ -4,7 +4,7 @@ part 'token_response_model.freezed.dart';
 part 'token_response_model.g.dart';
 
 @freezed
-class TokenResponseModel with _$TokenResponseModel {
+abstract class TokenResponseModel with _$TokenResponseModel {
   const factory TokenResponseModel({
     @JsonKey(name: 'access_token') required String accessToken,
     @JsonKey(name: 'token_type') required String tokenType,
