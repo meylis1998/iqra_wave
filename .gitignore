@@ -36,12 +36,8 @@ migrate_working_dir/
 
 # Environment files - NEVER commit secrets
 .env
-.env.local
-.env.*.local
-.env.dev
-.env.staging
-.env.production
-# Keep .env.dev and .env.staging for reference (without real secrets)
+.env.*
+!.env.example
 
 
 # Symbolication related
