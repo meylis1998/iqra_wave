@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:iqra_wave/core/error/failures.dart';
 import 'package:iqra_wave/core/utils/logger.dart';
 
-/// Reusable widget for displaying authentication errors
-/// Provides user-friendly messages and retry functionality
 class AuthErrorWidget extends StatelessWidget {
   const AuthErrorWidget({
     required this.message,
@@ -22,7 +20,6 @@ class AuthErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final errorInfo = _getErrorInfo();
 
-    // Log error for debugging
     AppLogger.error('Auth error displayed: $message', failure);
 
     return Center(
@@ -44,8 +41,8 @@ class AuthErrorWidget extends StatelessWidget {
                 Text(
                   errorInfo.title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: errorInfo.color,
-                      ),
+                    color: errorInfo.color,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -78,7 +75,9 @@ class AuthErrorWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(

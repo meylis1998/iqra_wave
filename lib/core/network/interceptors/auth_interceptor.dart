@@ -7,12 +7,10 @@ import 'package:iqra_wave/core/usecase/usecase.dart';
 import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/domain/usecases/get_access_token.dart';
 
-/// Auth interceptor for Quran.Foundation OAuth2
-/// Automatically handles token injection and refresh
 class AuthInterceptor extends Interceptor {
   AuthInterceptor()
-      : _tokenService = getIt<TokenService>(),
-        _getAccessToken = getIt<GetAccessToken>();
+    : _tokenService = getIt<TokenService>(),
+      _getAccessToken = getIt<GetAccessToken>();
 
   final TokenService _tokenService;
   final GetAccessToken _getAccessToken;
@@ -23,13 +21,11 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Skip OAuth2 token endpoint to prevent infinite loop
     if (options.path.contains(ApiConstants.oauth2Token)) {
       AppLogger.debug('Skipping auth interceptor for OAuth endpoint');
       return handler.next(options);
     }
 
-    // Skip legacy login/register endpoints
     if (options.path.contains(ApiConstants.login) ||
         options.path.contains(ApiConstants.register)) {
       return handler.next(options);
@@ -40,7 +36,6 @@ class AuthInterceptor extends Interceptor {
       final hasValidToken = await _tokenService.hasValidToken();
 
       if (!hasValidToken && !_isRefreshing) {
-        // Token is expired or missing, get a new one
         _isRefreshing = true;
         AppLogger.info('Token expired or missing, requesting new token');
 
@@ -50,7 +45,6 @@ class AuthInterceptor extends Interceptor {
           (failure) {
             _isRefreshing = false;
             AppLogger.error('Failed to get access token: ${failure.message}');
-            // Continue without token - let the API handle the 401
           },
           (token) {
             _isRefreshing = false;
@@ -59,11 +53,9 @@ class AuthInterceptor extends Interceptor {
         );
       }
 
-      // Get token and client ID
       final token = await _tokenService.getAccessToken();
       final clientId = await _tokenService.getClientId();
 
-      // Add Quran.Foundation specific headers
       if (token != null && token.isNotEmpty) {
         options.headers[ApiConstants.xAuthToken] = token;
         AppLogger.debug('Added x-auth-token header');
@@ -73,7 +65,6 @@ class AuthInterceptor extends Interceptor {
         options.headers[ApiConstants.xClientId] = clientId;
         AppLogger.debug('Added x-client-id header: $clientId');
       } else {
-        // Fallback to config client ID
         options.headers[ApiConstants.xClientId] = AppConfig.oauthClientId;
         AppLogger.debug('Added x-client-id header from config');
       }
@@ -91,7 +82,6 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Handle 401 Unauthorized - token might be expired
     if (err.response?.statusCode == 401 && !_isRefreshing) {
       try {
         _isRefreshing = true;
@@ -109,7 +99,6 @@ class AuthInterceptor extends Interceptor {
             _isRefreshing = false;
             AppLogger.info('Token refreshed, retrying request');
 
-            // Retry the original request with new token
             final requestOptions = err.requestOptions;
             requestOptions.headers[ApiConstants.xAuthToken] = token.accessToken;
             requestOptions.headers[ApiConstants.xClientId] =

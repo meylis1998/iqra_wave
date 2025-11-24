@@ -19,7 +19,6 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('IqraWave'),
           actions: [
-            // Auth status indicator
             BlocBuilder<AuthBloc, AuthState>(
               builder: (context, state) {
                 return IconButton(
@@ -40,7 +39,7 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            // Theme switcher
+
             BlocBuilder<ThemeCubit, ThemeMode>(
               builder: (context, themeMode) {
                 return ThemeSwitcher(
@@ -54,18 +53,15 @@ class HomePage extends StatelessWidget {
                       onPressed: () {
                         final themeCubit = context.read<ThemeCubit>();
 
-                        // Determine the target theme BEFORE toggling
                         final newTheme = themeCubit.state == ThemeMode.dark
                             ? AppTheme.lightTheme
                             : AppTheme.darkTheme;
 
-                        // Trigger animation with new theme and reverse option
                         ThemeSwitcher.of(context).changeTheme(
                           theme: newTheme,
                           isReversed: themeCubit.state == ThemeMode.light,
                         );
 
-                        // Update cubit state
                         themeCubit.toggleTheme();
                       },
                     );
@@ -73,7 +69,7 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            // Menu with auth options
+
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'auth_status') {
@@ -99,7 +95,10 @@ class HomePage extends StatelessWidget {
                     children: [
                       Icon(Icons.logout, color: Colors.red),
                       SizedBox(width: 8),
-                      Text('Clear Auth Data', style: TextStyle(color: Colors.red)),
+                      Text(
+                        'Clear Auth Data',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ],
                   ),
                 ),
@@ -107,68 +106,68 @@ class HomePage extends StatelessWidget {
             ),
           ],
         ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                size: 100,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Welcome to IqraWave',
-                style: Theme.of(context).textTheme.displaySmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'A production-ready Flutter starter template with Clean Architecture and BLoC pattern',
-                style: Theme.of(context).textTheme.bodyLarge,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48),
-              const _FeatureCard(
-                icon: Icons.architecture,
-                title: 'Clean Architecture',
-                description: 'Separation of concerns with proper layers',
-              ),
-              const SizedBox(height: 16),
-              const _FeatureCard(
-                icon: Icons.widgets,
-                title: 'BLoC Pattern',
-                description: 'Reactive state management solution',
-              ),
-              const SizedBox(height: 16),
-              const _FeatureCard(
-                icon: Icons.api,
-                title: 'API Integration',
-                description: 'Dio with interceptors and error handling',
-              ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () => context.push(RouteNames.authStatus),
-                    icon: const Icon(Icons.admin_panel_settings),
-                    label: const Text('Auth Status'),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => context.go(RouteNames.posts),
-                    icon: const Icon(Icons.article),
-                    label: const Text('Posts'),
-                  ),
-                ],
-              ),
-            ],
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 100,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Welcome to IqraWave',
+                  style: Theme.of(context).textTheme.displaySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'A production-ready Flutter starter template with Clean Architecture and BLoC pattern',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+                const _FeatureCard(
+                  icon: Icons.architecture,
+                  title: 'Clean Architecture',
+                  description: 'Separation of concerns with proper layers',
+                ),
+                const SizedBox(height: 16),
+                const _FeatureCard(
+                  icon: Icons.widgets,
+                  title: 'BLoC Pattern',
+                  description: 'Reactive state management solution',
+                ),
+                const SizedBox(height: 16),
+                const _FeatureCard(
+                  icon: Icons.api,
+                  title: 'API Integration',
+                  description: 'Dio with interceptors and error handling',
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () => context.push(RouteNames.authStatus),
+                      icon: const Icon(Icons.admin_panel_settings),
+                      label: const Text('Auth Status'),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: () => context.go(RouteNames.posts),
+                      icon: const Icon(Icons.article),
+                      label: const Text('Posts'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -193,12 +192,13 @@ class HomePage extends StatelessWidget {
               context.pop();
               context.read<AuthBloc>().add(const AuthLogout());
 
-              // Show feedback after dialog closes
               Future.delayed(const Duration(milliseconds: 300), () {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Auth data cleared. Restart app to re-authenticate.'),
+                      content: Text(
+                        'Auth data cleared. Restart app to re-authenticate.',
+                      ),
                       duration: Duration(seconds: 3),
                     ),
                   );

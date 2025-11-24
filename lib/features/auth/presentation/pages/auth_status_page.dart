@@ -4,8 +4,6 @@ import 'package:iqra_wave/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_event.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 
-/// Example page demonstrating OAuth2 authentication status
-/// Shows current auth state and provides controls to test auth operations
 class AuthStatusPage extends StatelessWidget {
   const AuthStatusPage({super.key});
 
@@ -202,12 +200,12 @@ class AuthStatusPage extends StatelessWidget {
 
   Widget _buildActionButtons(BuildContext context, AuthState state) {
     final isLoading = state is AuthLoading || state is AuthRefreshing;
-    final isUnauthenticated = state is AuthUnauthenticated || state is AuthError;
+    final isUnauthenticated =
+        state is AuthUnauthenticated || state is AuthError;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Show Login button prominently when unauthenticated
         if (isUnauthenticated) ...[
           ElevatedButton.icon(
             onPressed: isLoading
@@ -224,7 +222,7 @@ class AuthStatusPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-        // Show other actions when authenticated
+
         if (state is AuthAuthenticated) ...[
           ElevatedButton.icon(
             onPressed: isLoading
@@ -262,7 +260,7 @@ class AuthStatusPage extends StatelessWidget {
             ),
           ),
         ],
-        // Always show check status
+
         const SizedBox(height: 12),
         ElevatedButton.icon(
           onPressed: isLoading

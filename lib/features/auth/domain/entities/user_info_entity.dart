@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// User information entity from OpenID Connect userinfo endpoint
 class UserInfoEntity extends Equatable {
   const UserInfoEntity({
     required this.email,
@@ -12,7 +11,6 @@ class UserInfoEntity extends Equatable {
   final String? firstName;
   final String? lastName;
 
-  /// Get full name (first name + last name)
   String get fullName {
     final parts = <String>[];
     if (firstName != null && firstName!.isNotEmpty) {
@@ -24,7 +22,6 @@ class UserInfoEntity extends Equatable {
     return parts.isEmpty ? email : parts.join(' ');
   }
 
-  /// Get display name (full name or email)
   String get displayName => fullName.isNotEmpty ? fullName : email;
 
   @override

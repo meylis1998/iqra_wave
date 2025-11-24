@@ -28,7 +28,8 @@
       "Bash(CLIENT_SECRET=\"cjBj46-wJJkUr15euqZ1sTfbiC\")",
       "Bash(__NEW_LINE__ curl -s -X POST \"https://prelive-oauth2.quran.foundation/oauth2/token\" )",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

@@ -8,21 +8,14 @@ import 'package:iqra_wave/core/error/exceptions.dart';
 import 'package:iqra_wave/features/auth/data/models/token_response_model.dart';
 import 'package:iqra_wave/features/auth/data/models/user_info_model.dart';
 
-/// Abstract contract for auth remote data source
 abstract class AuthRemoteDataSource {
-  /// Request access token using client credentials grant
   Future<TokenResponseModel> getAccessToken();
 
-  /// Get user information from OpenID Connect userinfo endpoint
-  /// Requires a valid access token
   Future<UserInfoModel> getUserInfo(String accessToken);
 
-  /// Logout user by calling the OpenID Connect logout endpoint
   Future<void> logout(String? idTokenHint);
 }
 
-/// Implementation of [AuthRemoteDataSource] using Dio
-/// Handles OAuth2 client_credentials flow with Quran.Foundation API
 @LazySingleton(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this._dio);
@@ -32,7 +25,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<TokenResponseModel> getAccessToken() async {
     try {
-      // Create a separate Dio instance for OAuth requests to avoid interceptor loops
       final oauthDio = Dio(
         BaseOptions(
           baseUrl: AppConfig.oauthBaseUrl,
@@ -46,11 +38,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
 
-      // Using Basic Auth (client_secret_basic) as per OAuth2 RFC 6749
-      final credentials = '${AppConfig.oauthClientId}:${AppConfig.oauthClientSecret}';
+      final credentials =
+          '${AppConfig.oauthClientId}:${AppConfig.oauthClientSecret}';
       final basicAuth = 'Basic ${base64.encode(utf8.encode(credentials))}';
 
-      // Prepare OAuth2 request body
       final requestData = {
         'grant_type': ApiConstants.grantTypeClientCredentials,
         'scope': ApiConstants.scopeContent,
@@ -68,7 +59,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        // Add issued timestamp
         final tokenData = {
           ...response.data!,
           'issuedAt': DateTime.now().millisecondsSinceEpoch ~/ 1000,
@@ -125,7 +115,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserInfoModel> getUserInfo(String accessToken) async {
     try {
-      // Create a separate Dio instance for OAuth requests
       final oauthDio = Dio(
         BaseOptions(
           baseUrl: AppConfig.oauthBaseUrl,
@@ -152,7 +141,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on DioException catch (e) {
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
-        final errorData = e.response!.data;
 
         switch (statusCode) {
           case 401:
@@ -188,35 +176,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> logout(String? idTokenHint) async {
-    try {
-      // Create a separate Dio instance for OAuth requests
-      final oauthDio = Dio(
-        BaseOptions(
-          baseUrl: AppConfig.oauthBaseUrl,
-          connectTimeout: ApiConstants.connectTimeout,
-          receiveTimeout: ApiConstants.receiveTimeout,
-          followRedirects: false,
-          validateStatus: (status) {
-            // Accept 302 redirects as success
-            return status != null && (status < 400 || status == 302);
-          },
-        ),
-      );
+    final oauthDio = Dio(
+      BaseOptions(
+        baseUrl: AppConfig.oauthBaseUrl,
+        connectTimeout: ApiConstants.connectTimeout,
+        receiveTimeout: ApiConstants.receiveTimeout,
+        followRedirects: false,
+        validateStatus: (status) {
+          return status != null && (status < 400 || status == 302);
+        },
+      ),
+    );
 
-      final queryParams = <String, dynamic>{};
-      if (idTokenHint != null && idTokenHint.isNotEmpty) {
-        queryParams['id_token_hint'] = idTokenHint;
-      }
-
-      final response = await oauthDio.get(
-        ApiConstants.oauth2Logout,
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      );
-    } on DioException catch (e) {
-      // Don't throw error on logout - just log it
-      // The user should still be logged out locally
-    } catch (e) {
-      // Don't throw - continue with local logout
+    final queryParams = <String, dynamic>{};
+    if (idTokenHint != null && idTokenHint.isNotEmpty) {
+      queryParams['id_token_hint'] = idTokenHint;
     }
+
+    await oauthDio.get(
+      ApiConstants.oauth2Logout,
+      queryParameters: queryParams.isNotEmpty ? queryParams : null,
+    );
   }
 }

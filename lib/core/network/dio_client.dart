@@ -38,10 +38,6 @@ class DioClient {
     ]);
   }
 
-  void updateBaseUrl(String baseUrl) {
-    _dio.options.baseUrl = baseUrl;
-  }
-
   void updateHeaders(Map<String, dynamic> headers) {
     _dio.options.headers.addAll(headers);
   }

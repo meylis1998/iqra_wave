@@ -62,11 +62,10 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          // Navigate to home when authenticated
           if (state is AuthAuthenticated) {
             _navigateToHome();
           }
-          // Navigate to home when unauthenticated (user needs to login manually)
+
           if (state is AuthUnauthenticated) {
             _navigateToHome();
           }

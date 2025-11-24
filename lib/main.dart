@@ -51,9 +51,7 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          // Show user-friendly error notifications
           if (state is AuthError) {
-            // Only show SnackBar if we have a scaffold messenger
             WidgetsBinding.instance.addPostFrameCallback((_) {
               final messenger = ScaffoldMessenger.maybeOf(context);
               if (messenger != null) {
@@ -108,7 +106,6 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  /// Convert technical error messages to user-friendly ones
   String _getErrorMessage(String technicalMessage) {
     if (technicalMessage.toLowerCase().contains('network') ||
         technicalMessage.toLowerCase().contains('internet')) {

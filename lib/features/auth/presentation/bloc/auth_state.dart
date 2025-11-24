@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
 import 'package:iqra_wave/features/auth/domain/entities/user_info_entity.dart';
 
-/// Base class for all auth states
 abstract class AuthState extends Equatable {
   const AuthState();
 
@@ -10,17 +9,14 @@ abstract class AuthState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Initial state before any auth operations
 class AuthInitial extends AuthState {
   const AuthInitial();
 }
 
-/// Loading state while checking or fetching token
 class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
-/// State when user is authenticated with valid token
 class AuthAuthenticated extends AuthState {
   const AuthAuthenticated(this.token);
 
@@ -30,7 +26,6 @@ class AuthAuthenticated extends AuthState {
   List<Object?> get props => [token];
 }
 
-/// State when user is not authenticated (no token or invalid)
 class AuthUnauthenticated extends AuthState {
   const AuthUnauthenticated([this.message]);
 
@@ -40,7 +35,6 @@ class AuthUnauthenticated extends AuthState {
   List<Object?> get props => [message];
 }
 
-/// State when an error occurs during auth operations
 class AuthError extends AuthState {
   const AuthError(this.message);
 
@@ -50,12 +44,10 @@ class AuthError extends AuthState {
   List<Object?> get props => [message];
 }
 
-/// State when token is being refreshed
 class AuthRefreshing extends AuthState {
   const AuthRefreshing();
 }
 
-/// State when user info is loaded
 class AuthUserInfoLoaded extends AuthState {
   const AuthUserInfoLoaded(this.userInfo, this.token);
 
@@ -66,7 +58,6 @@ class AuthUserInfoLoaded extends AuthState {
   List<Object?> get props => [userInfo, token];
 }
 
-/// State when loading user info
 class AuthUserInfoLoading extends AuthState {
   const AuthUserInfoLoading();
 }

@@ -36,7 +36,6 @@ class AppConfig {
 
   static bool get enableLogging => _environment != Environment.prod;
 
-  // Quran.Foundation OAuth2 Configuration
   static String get oauthBaseUrl {
     switch (_environment) {
       case Environment.dev:
@@ -69,15 +68,13 @@ class AppConfig {
     }
   }
 
-  // NOTE: In production, this should be stored in secure environment variables
-  // or retrieved from a secure backend service, never hardcoded
   static String get oauthClientSecret {
     switch (_environment) {
       case Environment.dev:
       case Environment.staging:
-        return 'cjBj46-wJJkUr15euqZ1sTfbiC'; // Fixed: wJJk (not wdJk) and euqZ1 (not euqZl)
+        return 'cjBj46-wJJkUr15euqZ1sTfbiC';
       case Environment.prod:
-        return '4b9rxwZa80dy2l.HUfmSd4fUH7'; // Fixed: dy2l (not dy21)
+        return '4b9rxwZa80dy2l.HUfmSd4fUH7';
     }
   }
 }

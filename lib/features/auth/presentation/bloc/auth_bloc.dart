@@ -10,8 +10,6 @@ import 'package:iqra_wave/features/auth/domain/usecases/refresh_token.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_event.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 
-/// BLoC for managing authentication state
-/// Handles OAuth2 token lifecycle for Quran.Foundation API
 @injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(
@@ -35,12 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LogoutUser _logoutUser;
   final AuthRepository _authRepository;
 
-  // Cache the current token for user info requests
   TokenEntity? _currentToken;
 
-  /// Initialize authentication on app startup
-  /// Checks if valid token exists in storage
-  /// Does NOT automatically request new token if none exists
   Future<void> _onInitialize(
     AuthInitialize event,
     Emitter<AuthState> emit,
@@ -48,16 +42,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoading());
 
     try {
-      // Check if valid token already exists
       final hasValidToken = await _authRepository.hasValidToken();
 
       if (hasValidToken) {
-        // Retrieve the stored token without making API call
         final result = await _authRepository.getStoredToken();
 
         result.fold(
           (failure) {
-            // Token exists but couldn't be retrieved - stay unauthenticated
             _currentToken = null;
             emit(const AuthUnauthenticated('Please authenticate'));
           },
@@ -67,7 +58,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           },
         );
       } else {
-        // No valid token - user needs to authenticate explicitly
         _currentToken = null;
         emit(const AuthUnauthenticated('Please authenticate'));
       }
@@ -77,7 +67,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Refresh the access token
   Future<void> _onRefreshToken(
     AuthRefreshToken event,
     Emitter<AuthState> emit,
@@ -102,7 +91,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Logout - clear all auth data
   Future<void> _onLogout(
     AuthLogout event,
     Emitter<AuthState> emit,
@@ -116,7 +104,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) {
-          // Still emit unauthenticated even if server call failed
           _currentToken = null;
           emit(const AuthUnauthenticated('Logged out (offline)'));
         },
@@ -131,7 +118,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Check current authentication status
   Future<void> _onCheckStatus(
     AuthCheckStatus event,
     Emitter<AuthState> emit,
@@ -140,7 +126,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final hasValidToken = await _authRepository.hasValidToken();
 
       if (hasValidToken) {
-        // Get fresh token to have the entity
         final result = await _getAccessToken(NoParams());
 
         result.fold(
@@ -161,7 +146,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Get user information from OpenID Connect userinfo endpoint
   Future<void> _onGetUserInfo(
     AuthGetUserInfo event,
     Emitter<AuthState> emit,
@@ -169,7 +153,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthUserInfoLoading());
 
     try {
-      // Ensure we have a valid token first
       if (_currentToken == null) {
         final tokenResult = await _getAccessToken(NoParams());
         await tokenResult.fold(
@@ -188,7 +171,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         return;
       }
 
-      // Get user info
       final result = await _getUserInfo(NoParams());
 
       result.fold(
@@ -204,8 +186,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  /// Request login - explicitly get a new access token
-  /// This should be triggered by user action (e.g., login button)
   Future<void> _onRequestLogin(
     AuthRequestLogin event,
     Emitter<AuthState> emit,
