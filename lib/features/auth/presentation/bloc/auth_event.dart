@@ -38,3 +38,9 @@ class AuthCheckStatus extends AuthEvent {
 class AuthGetUserInfo extends AuthEvent {
   const AuthGetUserInfo();
 }
+
+/// Event to explicitly request authentication (get new token)
+/// This should be triggered by user action (e.g., login button)
+class AuthRequestLogin extends AuthEvent {
+  const AuthRequestLogin();
+}

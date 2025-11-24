@@ -26,10 +26,9 @@ void main() async {
   AppConfig.setEnvironment(Environment.dev);
 
   final sharedPreferences = await SharedPreferences.getInstance();
-  getIt..registerLazySingleton(() => sharedPreferences)
-
-  // Register FlutterSecureStorage
-  ..registerLazySingleton(() => const FlutterSecureStorage());
+  getIt
+    ..registerLazySingleton(() => sharedPreferences)
+    ..registerLazySingleton(() => const FlutterSecureStorage());
 
   await configureDependencies();
 

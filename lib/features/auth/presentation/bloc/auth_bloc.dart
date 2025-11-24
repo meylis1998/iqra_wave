@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/usecase/usecase.dart';
-import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
 import 'package:iqra_wave/features/auth/domain/repositories/auth_repository.dart';
 import 'package:iqra_wave/features/auth/domain/usecases/get_access_token.dart';
@@ -27,6 +26,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogout>(_onLogout);
     on<AuthCheckStatus>(_onCheckStatus);
     on<AuthGetUserInfo>(_onGetUserInfo);
+    on<AuthRequestLogin>(_onRequestLogin);
   }
 
   final GetAccessToken _getAccessToken;
@@ -39,7 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   TokenEntity? _currentToken;
 
   /// Initialize authentication on app startup
-  /// Checks if valid token exists, otherwise requests a new one
+  /// Checks if valid token exists in storage
+  /// Does NOT automatically request new token if none exists
   Future<void> _onInitialize(
     AuthInitialize event,
     Emitter<AuthState> emit,
@@ -51,14 +52,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final hasValidToken = await _authRepository.hasValidToken();
 
       if (hasValidToken) {
-        // We don't have the token entity here, so we need to get it
-        // For now, we'll request a fresh token to ensure we have the entity
-        final result = await _getAccessToken(NoParams());
+        // Retrieve the stored token without making API call
+        final result = await _authRepository.getStoredToken();
 
         result.fold(
           (failure) {
+            // Token exists but couldn't be retrieved - stay unauthenticated
             _currentToken = null;
-            emit(AuthUnauthenticated(failure.message));
+            emit(const AuthUnauthenticated('Please authenticate'));
           },
           (token) {
             _currentToken = token;
@@ -66,21 +67,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           },
         );
       } else {
-        final result = await _getAccessToken(NoParams());
-
-        result.fold(
-          (failure) {
-            _currentToken = null;
-            emit(AuthError(failure.message));
-          },
-          (token) {
-            _currentToken = token;
-            emit(AuthAuthenticated(token));
-          },
-        );
+        // No valid token - user needs to authenticate explicitly
+        _currentToken = null;
+        emit(const AuthUnauthenticated('Please authenticate'));
       }
     } catch (e) {
-      emit(AuthError('Failed to initialize authentication: $e'));
+      _currentToken = null;
+      emit(const AuthUnauthenticated('Authentication required'));
     }
   }
 
@@ -208,6 +201,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     } catch (e) {
       emit(AuthError('Failed to get user info: $e'));
+    }
+  }
+
+  /// Request login - explicitly get a new access token
+  /// This should be triggered by user action (e.g., login button)
+  Future<void> _onRequestLogin(
+    AuthRequestLogin event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoading());
+
+    try {
+      final result = await _getAccessToken(NoParams());
+
+      result.fold(
+        (failure) {
+          _currentToken = null;
+          emit(AuthError(failure.message));
+        },
+        (token) {
+          _currentToken = token;
+          emit(AuthAuthenticated(token));
+        },
+      );
+    } catch (e) {
+      _currentToken = null;
+      emit(AuthError('Failed to authenticate: $e'));
     }
   }
 }

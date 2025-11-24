@@ -201,31 +201,71 @@ class AuthStatusPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, AuthState state) {
+    final isLoading = state is AuthLoading || state is AuthRefreshing;
+    final isUnauthenticated = state is AuthUnauthenticated || state is AuthError;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton.icon(
-          onPressed: state is AuthLoading || state is AuthRefreshing
-              ? null
-              : () {
-                  context.read<AuthBloc>().add(const AuthInitialize());
-                },
-          icon: const Icon(Icons.login),
-          label: const Text('Initialize Auth'),
-        ),
+        // Show Login button prominently when unauthenticated
+        if (isUnauthenticated) ...[
+          ElevatedButton.icon(
+            onPressed: isLoading
+                ? null
+                : () {
+                    context.read<AuthBloc>().add(const AuthRequestLogin());
+                  },
+            icon: const Icon(Icons.login),
+            label: const Text('Login / Get Token'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+        // Show other actions when authenticated
+        if (state is AuthAuthenticated) ...[
+          ElevatedButton.icon(
+            onPressed: isLoading
+                ? null
+                : () {
+                    context.read<AuthBloc>().add(const AuthRefreshToken());
+                  },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Refresh Token'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: isLoading
+                ? null
+                : () {
+                    context.read<AuthBloc>().add(const AuthGetUserInfo());
+                  },
+            icon: const Icon(Icons.person),
+            label: const Text('Get User Info'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: isLoading
+                ? null
+                : () {
+                    context.read<AuthBloc>().add(const AuthLogout());
+                  },
+            icon: const Icon(Icons.logout),
+            label: const Text('Logout'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+          ),
+        ],
+        // Always show check status
         const SizedBox(height: 12),
         ElevatedButton.icon(
-          onPressed: state is AuthLoading || state is AuthRefreshing
-              ? null
-              : () {
-                  context.read<AuthBloc>().add(const AuthRefreshToken());
-                },
-          icon: const Icon(Icons.refresh),
-          label: const Text('Refresh Token'),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton.icon(
-          onPressed: state is AuthLoading || state is AuthRefreshing
+          onPressed: isLoading
               ? null
               : () {
                   context.read<AuthBloc>().add(const AuthCheckStatus());
@@ -233,20 +273,7 @@ class AuthStatusPage extends StatelessWidget {
           icon: const Icon(Icons.search),
           label: const Text('Check Status'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-          ),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton.icon(
-          onPressed: state is AuthLoading || state is AuthRefreshing
-              ? null
-              : () {
-                  context.read<AuthBloc>().add(const AuthLogout());
-                },
-          icon: const Icon(Icons.logout),
-          label: const Text('Clear Auth Data'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.grey,
           ),
         ),
       ],

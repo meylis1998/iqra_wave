@@ -70,6 +70,41 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, TokenEntity>> getStoredToken() async {
+    try {
+      // Get stored token data
+      final accessToken = await _tokenService.getAccessToken();
+      final expiry = await _tokenService.getTokenExpiry();
+
+      if (accessToken == null || accessToken.isEmpty || expiry == null) {
+        return const Left(AuthenticationFailure('No stored token available'));
+      }
+
+      // Check if token is expired
+      final isExpired = await _tokenService.isTokenExpired();
+      if (isExpired) {
+        return const Left(TokenExpiredFailure('Stored token has expired'));
+      }
+
+      // Calculate expiresIn from stored expiry timestamp
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      final expiresIn = expiry - now;
+      final issuedAt = expiry - expiresIn;
+
+      final entity = TokenEntity(
+        accessToken: accessToken,
+        tokenType: 'Bearer',
+        expiresIn: expiresIn,
+        issuedAt: issuedAt,
+      );
+
+      return Right(entity);
+    } catch (e) {
+      return Left(UnexpectedFailure('Failed to get stored token: $e'));
+    }
+  }
+
+  @override
   Future<void> clearAuthData() async {
     try {
       await _tokenService.clearTokens();

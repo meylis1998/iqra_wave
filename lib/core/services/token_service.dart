@@ -2,7 +2,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/constants/storage_constants.dart';
-import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/data/models/token_response_model.dart';
 
 @lazySingleton

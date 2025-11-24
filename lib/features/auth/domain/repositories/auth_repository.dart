@@ -19,6 +19,10 @@ abstract class AuthRepository {
   /// Returns true if token exists and is not expired
   Future<bool> hasValidToken();
 
+  /// Get the stored token from local storage without making API call
+  /// Returns [TokenEntity] on success or [Failure] if no valid token exists
+  Future<Either<Failure, TokenEntity>> getStoredToken();
+
   /// Get user information from OpenID Connect userinfo endpoint
   /// Requires a valid access token
   /// Returns [UserInfoEntity] on success or [Failure] on error
