@@ -1,11 +1,32 @@
+import 'package:iqra_wave/core/configs/secrets_manager.dart';
+
 enum Environment { dev, staging, prod }
 
 class AppConfig {
   static Environment _environment = Environment.dev;
   static bool _isDebugMode = true;
+  static SecretsManager? _secretsManager;
 
   static Environment get environment => _environment;
   static bool get isDebugMode => _isDebugMode;
+
+  static void initialize(SecretsManager secretsManager) {
+    _secretsManager = secretsManager;
+
+    final envString = secretsManager.getEnvironment().toLowerCase();
+    switch (envString) {
+      case 'dev':
+        _environment = Environment.dev;
+      case 'staging':
+        _environment = Environment.staging;
+      case 'prod':
+        _environment = Environment.prod;
+      default:
+        _environment = Environment.dev;
+    }
+
+    _isDebugMode = _environment == Environment.dev;
+  }
 
   static void setEnvironment(Environment env) {
     _environment = env;
@@ -34,47 +55,60 @@ class AppConfig {
     }
   }
 
-  static bool get enableLogging => _environment != Environment.prod;
+  static bool get enableLogging {
+    if (_secretsManager != null) {
+      return _secretsManager!.isLoggingEnabled();
+    }
+    return _environment != Environment.prod;
+  }
 
   static String get oauthBaseUrl {
-    switch (_environment) {
-      case Environment.dev:
-        return 'https://prelive-oauth2.quran.foundation';
-      case Environment.staging:
-        return 'https://prelive-oauth2.quran.foundation';
-      case Environment.prod:
-        return 'https://oauth2.quran.foundation';
-    }
+    _ensureInitialized();
+    return _secretsManager!.getOAuthBaseUrl();
   }
 
   static String get quranApiBaseUrl {
-    switch (_environment) {
-      case Environment.dev:
-        return 'https://prelive-api.quran.foundation';
-      case Environment.staging:
-        return 'https://prelive-api.quran.foundation';
-      case Environment.prod:
-        return 'https://api.quran.foundation';
-    }
+    _ensureInitialized();
+    return _secretsManager!.getQuranApiBaseUrl();
   }
 
   static String get oauthClientId {
-    switch (_environment) {
-      case Environment.dev:
-      case Environment.staging:
-        return '1025e8c6-f978-4186-aed4-7b82b71ec763';
-      case Environment.prod:
-        return '4d57db73-0de3-4ff9-8fc5-8ff5ecf51a08';
-    }
+    _ensureInitialized();
+    return _secretsManager!.getOAuthClientId();
   }
 
   static String get oauthClientSecret {
-    switch (_environment) {
-      case Environment.dev:
-      case Environment.staging:
-        return 'cjBj46-wJJkUr15euqZ1sTfbiC';
-      case Environment.prod:
-        return '4b9rxwZa80dy2l.HUfmSd4fUH7';
+    _ensureInitialized();
+    return _secretsManager!.getOAuthClientSecret();
+  }
+
+  static bool get enableCrashlytics {
+    if (_secretsManager != null) {
+      return _secretsManager!.isCrashlyticsEnabled();
+    }
+    return false;
+  }
+
+  static bool get enableAnalytics {
+    if (_secretsManager != null) {
+      return _secretsManager!.isAnalyticsEnabled();
+    }
+    return false;
+  }
+
+  static String? get sentryDsn {
+    if (_secretsManager != null) {
+      return _secretsManager!.getSentryDsn();
+    }
+    return null;
+  }
+
+  static void _ensureInitialized() {
+    if (_secretsManager == null) {
+      throw Exception(
+        'AppConfig not initialized. '
+        'Call AppConfig.initialize(secretsManager) before accessing config.',
+      );
     }
   }
 }

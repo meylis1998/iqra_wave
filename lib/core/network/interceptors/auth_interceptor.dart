@@ -2,77 +2,50 @@ import 'package:dio/dio.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/constants/api_constants.dart';
 import 'package:iqra_wave/core/di/injection_container.dart';
+import 'package:iqra_wave/core/services/token_refresh_manager.dart';
 import 'package:iqra_wave/core/services/token_service.dart';
-import 'package:iqra_wave/core/usecase/usecase.dart';
 import 'package:iqra_wave/core/utils/logger.dart';
-import 'package:iqra_wave/features/auth/domain/usecases/get_access_token.dart';
 
 class AuthInterceptor extends Interceptor {
   AuthInterceptor()
-    : _tokenService = getIt<TokenService>(),
-      _getAccessToken = getIt<GetAccessToken>();
+      : _tokenService = getIt<TokenService>(),
+        _tokenRefreshManager = getIt<TokenRefreshManager>();
 
   final TokenService _tokenService;
-  final GetAccessToken _getAccessToken;
-  bool _isRefreshing = false;
+  final TokenRefreshManager _tokenRefreshManager;
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (options.path.contains(ApiConstants.oauth2Token)) {
-      AppLogger.debug('Skipping auth interceptor for OAuth endpoint');
-      return handler.next(options);
-    }
-
-    if (options.path.contains(ApiConstants.login) ||
-        options.path.contains(ApiConstants.register)) {
+    if (_shouldSkipAuth(options)) {
       return handler.next(options);
     }
 
     try {
-      // Check if token is valid
-      final hasValidToken = await _tokenService.hasValidToken();
+      final isExpired = await _tokenService.isTokenExpired();
 
-      if (!hasValidToken && !_isRefreshing) {
-        _isRefreshing = true;
-        AppLogger.info('Token expired or missing, requesting new token');
+      if (isExpired) {
+        AppLogger.info('Token expired, refreshing...');
 
-        final result = await _getAccessToken(NoParams());
+        final result = await _tokenRefreshManager.refreshToken();
 
         result.fold(
           (failure) {
-            _isRefreshing = false;
-            AppLogger.error('Failed to get access token: ${failure.message}');
+            AppLogger.error('Token refresh failed: ${failure.message}');
           },
           (token) {
-            _isRefreshing = false;
-            AppLogger.info('New token obtained successfully');
+            AppLogger.info('Token refreshed successfully');
           },
         );
       }
 
-      final token = await _tokenService.getAccessToken();
-      final clientId = await _tokenService.getClientId();
-
-      if (token != null && token.isNotEmpty) {
-        options.headers[ApiConstants.xAuthToken] = token;
-        AppLogger.debug('Added x-auth-token header');
-      }
-
-      if (clientId != null && clientId.isNotEmpty) {
-        options.headers[ApiConstants.xClientId] = clientId;
-        AppLogger.debug('Added x-client-id header: $clientId');
-      } else {
-        options.headers[ApiConstants.xClientId] = AppConfig.oauthClientId;
-        AppLogger.debug('Added x-client-id header from config');
-      }
+      await _addAuthHeaders(options);
 
       return handler.next(options);
-    } catch (e) {
-      AppLogger.error('Error in auth interceptor', e);
-      _isRefreshing = false;
+    } catch (e, stackTrace) {
+      AppLogger.error('Error in auth interceptor', e, stackTrace);
       return handler.next(options);
     }
   }
@@ -82,43 +55,86 @@ class AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    if (err.response?.statusCode == 401 && !_isRefreshing) {
+    if (err.response?.statusCode == 401) {
       try {
-        _isRefreshing = true;
-        AppLogger.info('Received 401, attempting to refresh token');
+        AppLogger.info('Received 401, attempting token refresh');
 
-        final result = await _getAccessToken(NoParams());
+        final result = await _tokenRefreshManager.refreshToken();
 
-        await result.fold(
+        return await result.fold(
           (failure) async {
-            _isRefreshing = false;
             AppLogger.error('Token refresh failed: ${failure.message}');
+
+            await _tokenService.clearTokens();
+
             return handler.next(err);
           },
           (token) async {
-            _isRefreshing = false;
             AppLogger.info('Token refreshed, retrying request');
 
-            final requestOptions = err.requestOptions;
-            requestOptions.headers[ApiConstants.xAuthToken] = token.accessToken;
-            requestOptions.headers[ApiConstants.xClientId] =
-                AppConfig.oauthClientId;
-
-            try {
-              final response = await Dio().fetch(requestOptions);
-              return handler.resolve(response);
-            } catch (e) {
-              AppLogger.error('Retry request failed', e);
-              return handler.next(err);
-            }
+            return await _retryRequest(err, handler, token.accessToken);
           },
         );
-      } catch (e) {
-        _isRefreshing = false;
-        AppLogger.error('Error handling 401 response', e);
+      } catch (e, stackTrace) {
+        AppLogger.error('Error handling 401 response', e, stackTrace);
         return handler.next(err);
       }
+    }
+
+    return handler.next(err);
+  }
+
+  bool _shouldSkipAuth(RequestOptions options) {
+    if (options.path.contains(ApiConstants.oauth2Token)) {
+      AppLogger.debug('Skipping auth interceptor for OAuth endpoint');
+      return true;
+    }
+
+    if (options.path.contains(ApiConstants.login) ||
+        options.path.contains(ApiConstants.register)) {
+      AppLogger.debug('Skipping auth for login/register endpoint');
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<void> _addAuthHeaders(RequestOptions options) async {
+    final token = await _tokenService.getAccessToken();
+    final clientId = await _tokenService.getClientId();
+
+    if (token != null && token.isNotEmpty) {
+      options.headers[ApiConstants.xAuthToken] = token;
+      AppLogger.debug('Added x-auth-token header');
+    }
+
+    if (clientId != null && clientId.isNotEmpty) {
+      options.headers[ApiConstants.xClientId] = clientId;
+      AppLogger.debug('Added x-client-id header: $clientId');
     } else {
+      options.headers[ApiConstants.xClientId] = AppConfig.oauthClientId;
+      AppLogger.debug('Added x-client-id header from config');
+    }
+  }
+
+  Future<void> _retryRequest(
+    DioException err,
+    ErrorInterceptorHandler handler,
+    String accessToken,
+  ) async {
+    final options = err.requestOptions;
+
+    options.headers[ApiConstants.xAuthToken] = accessToken;
+    final clientId = await _tokenService.getClientId();
+    options.headers[ApiConstants.xClientId] =
+        clientId ?? AppConfig.oauthClientId;
+
+    try {
+      AppLogger.debug('Retrying request to ${options.path}');
+      final response = await Dio().fetch(options);
+      return handler.resolve(response);
+    } catch (e, stackTrace) {
+      AppLogger.error('Retry request failed', e, stackTrace);
       return handler.next(err);
     }
   }

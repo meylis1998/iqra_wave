@@ -1,38 +1,121 @@
+import 'dart:async';
+
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
+import 'package:iqra_wave/core/configs/secrets_manager.dart';
 import 'package:iqra_wave/core/di/injection_container.dart';
 import 'package:iqra_wave/core/routes/app_router.dart';
+import 'package:iqra_wave/core/services/observability_service.dart';
+import 'package:iqra_wave/core/services/performance_monitor.dart';
+import 'package:iqra_wave/core/services/token_refresh_scheduler.dart';
 import 'package:iqra_wave/core/theme/app_theme.dart';
 import 'package:iqra_wave/core/theme/theme_cubit.dart';
+import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_event.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  await runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: HydratedStorageDirectory(
-      (await getTemporaryDirectory()).path,
-    ),
+      final secretsManager = SecretsManager();
+      await secretsManager.initialize();
+
+      AppConfig.initialize(secretsManager);
+
+      AppLogger.info(
+        'Initializing ${AppConfig.appName} (${AppConfig.environment})',
+      );
+      AppLogger.debug('Configuration: ${secretsManager.getConfigDebugInfo()}');
+
+      try {
+        await Firebase.initializeApp();
+
+        if (AppConfig.enableCrashlytics) {
+          FlutterError.onError =
+              FirebaseCrashlytics.instance.recordFlutterFatalError;
+          PlatformDispatcher.instance.onError = (error, stack) {
+            FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+            return true;
+          };
+          AppLogger.info('Firebase Crashlytics enabled');
+        }
+      } catch (e) {
+        AppLogger.warning('Firebase not configured: $e');
+      }
+
+      HydratedBloc.storage = await HydratedStorage.build(
+        storageDirectory: HydratedStorageDirectory(
+          (await getTemporaryDirectory()).path,
+        ),
+      );
+
+      final sharedPreferences = await SharedPreferences.getInstance();
+      getIt
+        ..registerLazySingleton(() => sharedPreferences)
+        ..registerLazySingleton(() => const FlutterSecureStorage())
+        ..registerLazySingleton(() => secretsManager);
+
+      await configureDependencies();
+
+      await _initializeServices();
+
+      final sentryDsn = AppConfig.sentryDsn;
+      if (sentryDsn != null && sentryDsn.isNotEmpty) {
+        await SentryFlutter.init(
+          (options) {
+            options
+              ..dsn = sentryDsn
+              ..environment = AppConfig.environment.name
+              ..tracesSampleRate = AppConfig.environment == Environment.prod
+                  ? 0.2
+                  : 1.0
+              ..enableAutoSessionTracking = true
+              ..attachStacktrace = true
+              ..enableAutoPerformanceTracing = true
+              ..debug = AppConfig.environment == Environment.dev;
+
+            AppLogger.info('Sentry initialized');
+          },
+          appRunner: () => runApp(const MyApp()),
+        );
+      } else {
+        AppLogger.info(
+          'Sentry not configured - running without error tracking',
+        );
+        runApp(const MyApp());
+      }
+    },
+    (error, stack) {
+      AppLogger.fatal('Unhandled error', error, stack);
+    },
   );
+}
 
-  AppConfig.setEnvironment(Environment.dev);
+Future<void> _initializeServices() async {
+  try {
+    final observability = getIt<ObservabilityService>();
+    await observability.initialize();
 
-  final sharedPreferences = await SharedPreferences.getInstance();
-  getIt
-    ..registerLazySingleton(() => sharedPreferences)
-    ..registerLazySingleton(() => const FlutterSecureStorage());
+    final performanceMonitor = getIt<PerformanceMonitor>();
+    await performanceMonitor.initialize();
 
-  await configureDependencies();
-
-  runApp(const MyApp());
+    AppLogger.info('All services initialized successfully');
+  } catch (e, stackTrace) {
+    AppLogger.error('Failed to initialize services', e, stackTrace);
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -46,12 +129,29 @@ class MyApp extends StatelessWidget {
           create: (context) => getIt<ThemeCubit>(),
         ),
         BlocProvider(
-          create: (context) => getIt<AuthBloc>()..add(const AuthInitialize()),
+          create: (context) {
+            final bloc = getIt<AuthBloc>();
+
+            bloc.stream.listen((state) {
+              if (state is AuthAuthenticated) {
+                getIt<TokenRefreshScheduler>().startProactiveRefresh();
+                _trackAuthEvent('authenticated');
+              } else if (state is AuthUnauthenticated) {
+                getIt<TokenRefreshScheduler>().stopProactiveRefresh();
+              }
+            });
+
+            bloc.add(const AuthInitialize());
+
+            return bloc;
+          },
         ),
       ],
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
+            _trackAuthEvent('error', error: state.message);
+
             WidgetsBinding.instance.addPostFrameCallback((_) {
               final messenger = ScaffoldMessenger.maybeOf(context);
               if (messenger != null) {
@@ -122,5 +222,18 @@ class MyApp extends StatelessWidget {
       return 'Server error. Please try again later.';
     }
     return 'Authentication error occurred';
+  }
+
+  void _trackAuthEvent(String event, {String? error}) {
+    try {
+      final observability = getIt<ObservabilityService>();
+      if (error != null) {
+        observability.trackAuthError(event, error, null);
+      } else {
+        observability.trackAuthEvent(event);
+      }
+    } catch (e) {
+      AppLogger.debug('Failed to track auth event: $e');
+    }
   }
 }

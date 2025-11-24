@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/constants/storage_constants.dart';
+import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/data/models/token_response_model.dart';
 
 @lazySingleton
@@ -9,18 +10,29 @@ class TokenService {
   TokenService(this._secureStorage);
 
   final FlutterSecureStorage _secureStorage;
-  static const int _tokenBufferSeconds = 300; // 5 minutes
+  static const int _tokenBufferSeconds = 300;
 
-  /// Store the access token securely
-  /// [token] The token response from OAuth2 server
   Future<void> storeToken(TokenResponseModel token) async {
     try {
-      // Calculate issued timestamp if not set
       final issuedAt = token.issuedAt == 0
           ? DateTime.now().millisecondsSinceEpoch ~/ 1000
           : token.issuedAt;
 
       final updatedToken = token.copyWith(issuedAt: issuedAt);
+
+      final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(
+        updatedToken.expiryTimestamp * 1000,
+      );
+      final now = DateTime.now();
+      final timeUntilExpiry = expiryDateTime.difference(now);
+
+      AppLogger.info(
+        'Token stored successfully:\n'
+        '  Issued at: ${DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000)}\n'
+        '  Expires at: $expiryDateTime\n'
+        '  Valid for: ${timeUntilExpiry.inMinutes} minutes (${timeUntilExpiry.inSeconds} seconds)\n'
+        '  Token length: ${updatedToken.accessToken.length} characters',
+      );
 
       await _secureStorage.write(
         key: StorageConstants.quranFoundationToken,
@@ -41,8 +53,6 @@ class TokenService {
     }
   }
 
-  /// Retrieve the stored access token
-  /// Returns null if no token is stored
   Future<String?> getAccessToken() async {
     try {
       final token = await _secureStorage.read(
@@ -54,8 +64,6 @@ class TokenService {
     }
   }
 
-  /// Get the token expiry timestamp
-  /// Returns null if no expiry is stored
   Future<int?> getTokenExpiry() async {
     try {
       final expiryStr = await _secureStorage.read(
@@ -67,7 +75,6 @@ class TokenService {
     }
   }
 
-  /// Get the stored client ID
   Future<String?> getClientId() async {
     try {
       return await _secureStorage.read(
@@ -78,24 +85,41 @@ class TokenService {
     }
   }
 
-  /// Check if the current token is expired
-  /// Includes a 5-minute buffer for proactive refresh
   Future<bool> isTokenExpired() async {
     try {
       final expiry = await getTokenExpiry();
-      if (expiry == null) return true;
+      if (expiry == null) {
+        AppLogger.debug('No token expiry found - token is expired');
+        return true;
+      }
 
       final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final isExpired = now >= (expiry - _tokenBufferSeconds);
 
+      if (isExpired) {
+        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
+        final timeRemaining = expiry - now;
+
+        AppLogger.warning(
+          'Token is expired or expiring soon:\n'
+          '  Expires at: $expiryDateTime\n'
+          '  Time remaining: $timeRemaining seconds\n'
+          '  Buffer threshold: $_tokenBufferSeconds seconds',
+        );
+      } else {
+        final timeRemaining = expiry - now - _tokenBufferSeconds;
+        AppLogger.debug(
+          'Token is still valid. Time until refresh needed: $timeRemaining seconds',
+        );
+      }
+
       return isExpired;
     } catch (e) {
+      AppLogger.error('Error checking token expiry', e);
       return true;
     }
   }
 
-  /// Check if a valid token exists
-  /// Returns true only if token exists and is not expired
   Future<bool> hasValidToken() async {
     final token = await getAccessToken();
     if (token == null || token.isEmpty) return false;
@@ -104,7 +128,6 @@ class TokenService {
     return !isExpired;
   }
 
-  /// Clear all stored tokens and client information
   Future<void> clearTokens() async {
     try {
       await Future.wait([
@@ -117,18 +140,37 @@ class TokenService {
     }
   }
 
-  /// Get the time remaining until token expires (in seconds)
-  /// Returns null if no token or already expired
   Future<int?> getTimeUntilExpiry() async {
     try {
       final expiry = await getTokenExpiry();
-      if (expiry == null) return null;
+      if (expiry == null) {
+        AppLogger.debug('No token expiry - cannot calculate time remaining');
+        return null;
+      }
 
       final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final remaining = expiry - now;
 
-      return remaining > 0 ? remaining : null;
+      if (remaining > 0) {
+        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
+        AppLogger.debug(
+          'Token time remaining:\n'
+          '  Expires at: $expiryDateTime\n'
+          '  Seconds remaining: $remaining\n'
+          '  Minutes remaining: ${(remaining / 60).toStringAsFixed(1)}',
+        );
+        return remaining;
+      } else {
+        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
+        AppLogger.warning(
+          'Token has already expired:\n'
+          '  Expired at: $expiryDateTime\n'
+          '  Expired ${remaining.abs()} seconds ago',
+        );
+        return null;
+      }
     } catch (e) {
+      AppLogger.error('Error calculating time until expiry', e);
       return null;
     }
   }

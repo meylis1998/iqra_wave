@@ -20,23 +20,13 @@ TokenResponseModel _$TokenResponseModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TokenResponseModel {
-  /// The access token string (JWT)
   @JsonKey(name: 'access_token')
   String get accessToken => throw _privateConstructorUsedError;
-
-  /// The type of token (usually "Bearer")
   @JsonKey(name: 'token_type')
   String get tokenType => throw _privateConstructorUsedError;
-
-  /// Number of seconds until the token expires
   @JsonKey(name: 'expires_in')
   int get expiresIn => throw _privateConstructorUsedError;
-
-  /// The scope of access granted (e.g., "content")
   String? get scope => throw _privateConstructorUsedError;
-
-  /// Timestamp when the token was issued (calculated locally)
-  /// Used to determine if the token has expired
   int get issuedAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -175,27 +165,17 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
   factory _$TokenResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TokenResponseModelImplFromJson(json);
 
-  /// The access token string (JWT)
   @override
   @JsonKey(name: 'access_token')
   final String accessToken;
-
-  /// The type of token (usually "Bearer")
   @override
   @JsonKey(name: 'token_type')
   final String tokenType;
-
-  /// Number of seconds until the token expires
   @override
   @JsonKey(name: 'expires_in')
   final int expiresIn;
-
-  /// The scope of access granted (e.g., "content")
   @override
   final String? scope;
-
-  /// Timestamp when the token was issued (calculated locally)
-  /// Used to determine if the token has expired
   @override
   @JsonKey()
   final int issuedAt;
@@ -254,28 +234,17 @@ abstract class _TokenResponseModel extends TokenResponseModel {
       _$TokenResponseModelImpl.fromJson;
 
   @override
-
-  /// The access token string (JWT)
   @JsonKey(name: 'access_token')
   String get accessToken;
   @override
-
-  /// The type of token (usually "Bearer")
   @JsonKey(name: 'token_type')
   String get tokenType;
   @override
-
-  /// Number of seconds until the token expires
   @JsonKey(name: 'expires_in')
   int get expiresIn;
   @override
-
-  /// The scope of access granted (e.g., "content")
   String? get scope;
   @override
-
-  /// Timestamp when the token was issued (calculated locally)
-  /// Used to determine if the token has expired
   int get issuedAt;
   @override
   @JsonKey(ignore: true)

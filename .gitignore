@@ -32,6 +32,15 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+.claude/
+
+# Environment files - NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+# Keep .env.dev and .env.staging for reference (without real secrets)
+
 
 # Symbolication related
 app.*.symbols

@@ -50,7 +50,7 @@ class _ApiClient implements ApiClient {
           .map((dynamic i) => UserModel.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options, _result);
+      errorLogger?.logError(e, s, _options, null);
       rethrow;
     }
     return _value;
@@ -83,7 +83,7 @@ class _ApiClient implements ApiClient {
     try {
       _value = UserModel.fromJson(_result.data!);
     } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options, _result);
+      errorLogger?.logError(e, s, _options, null);
       rethrow;
     }
     return _value;

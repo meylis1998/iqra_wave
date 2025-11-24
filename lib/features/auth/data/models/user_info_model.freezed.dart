@@ -20,14 +20,9 @@ UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserInfoModel {
-  /// User's email address (RFC 5322 format)
   String get email => throw _privateConstructorUsedError;
-
-  /// User's first name
   @JsonKey(name: 'first_name')
   String? get firstName => throw _privateConstructorUsedError;
-
-  /// User's last name
   @JsonKey(name: 'last_name')
   String? get lastName => throw _privateConstructorUsedError;
 
@@ -141,16 +136,11 @@ class _$UserInfoModelImpl extends _UserInfoModel {
   factory _$UserInfoModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserInfoModelImplFromJson(json);
 
-  /// User's email address (RFC 5322 format)
   @override
   final String email;
-
-  /// User's first name
   @override
   @JsonKey(name: 'first_name')
   final String? firstName;
-
-  /// User's last name
   @override
   @JsonKey(name: 'last_name')
   final String? lastName;
@@ -202,17 +192,11 @@ abstract class _UserInfoModel extends UserInfoModel {
       _$UserInfoModelImpl.fromJson;
 
   @override
-
-  /// User's email address (RFC 5322 format)
   String get email;
   @override
-
-  /// User's first name
   @JsonKey(name: 'first_name')
   String? get firstName;
   @override
-
-  /// User's last name
   @JsonKey(name: 'last_name')
   String? get lastName;
   @override
