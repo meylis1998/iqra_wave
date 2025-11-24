@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/constants/api_constants.dart';
 import 'package:iqra_wave/core/error/exceptions.dart';
+import 'package:iqra_wave/core/utils/logger.dart';
 import 'package:iqra_wave/features/auth/data/models/token_response_model.dart';
 import 'package:iqra_wave/features/auth/data/models/user_info_model.dart';
 
@@ -130,6 +131,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final response = await oauthDio.get<Map<String, dynamic>>(
         ApiConstants.oauth2Userinfo,
       );
+
+      AppLogger.info('UserInfo Response Status: ${response.statusCode}');
+      AppLogger.info('UserInfo Response Data: ${response.data}');
 
       if (response.statusCode == 200 && response.data != null) {
         return UserInfoModel.fromJson(response.data!);

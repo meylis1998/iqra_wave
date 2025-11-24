@@ -44,6 +44,10 @@ class AuthStatusPage extends StatelessWidget {
                   _buildTokenInfo(state),
                   const SizedBox(height: 24),
                 ],
+                if (state is AuthUserInfoLoaded) ...[
+                  _buildUserInfoCard(state),
+                  const SizedBox(height: 24),
+                ],
                 _buildActionButtons(context, state),
               ],
             ),
@@ -89,6 +93,16 @@ class AuthStatusPage extends StatelessWidget {
       color = Colors.red;
       status = 'Error';
       message = state.message;
+    } else if (state is AuthUserInfoLoading) {
+      icon = Icons.hourglass_empty;
+      color = Colors.blue;
+      status = 'Loading';
+      message = 'Fetching user info...';
+    } else if (state is AuthUserInfoLoaded) {
+      icon = Icons.person;
+      color = Colors.green;
+      status = 'User Info Loaded';
+      message = 'User: ${state.userInfo.displayName}';
     } else {
       icon = Icons.help;
       color = Colors.grey;
@@ -182,6 +196,75 @@ class AuthStatusPage extends StatelessWidget {
     );
   }
 
+  Widget _buildUserInfoCard(AuthUserInfoLoaded state) {
+    final userInfo = state.userInfo;
+    final token = state.token;
+    final expiryDateTime = token.expiryDateTime;
+    final timeUntilExpiry = expiryDateTime.difference(DateTime.now());
+    final hoursUntilExpiry = timeUntilExpiry.inHours;
+    final minutesUntilExpiry = timeUntilExpiry.inMinutes % 60;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'User Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+            _buildInfoRow('Display Name', userInfo.displayName),
+            if (userInfo.email != null)
+              _buildInfoRow('Email', userInfo.email!),
+            if (userInfo.firstName != null)
+              _buildInfoRow('First Name', userInfo.firstName!),
+            if (userInfo.lastName != null)
+              _buildInfoRow('Last Name', userInfo.lastName!),
+            const SizedBox(height: 16),
+            const Text(
+              'Token Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+            _buildInfoRow('Token Type', token.tokenType),
+            _buildInfoRow('Expires In', '${token.expiresIn} seconds'),
+            _buildInfoRow(
+              'Time Until Expiry',
+              '$hoursUntilExpiry hours, $minutesUntilExpiry minutes',
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green[200]!),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Token securely stored',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -199,9 +282,13 @@ class AuthStatusPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, AuthState state) {
-    final isLoading = state is AuthLoading || state is AuthRefreshing;
+    final isLoading = state is AuthLoading ||
+        state is AuthRefreshing ||
+        state is AuthUserInfoLoading;
     final isUnauthenticated =
         state is AuthUnauthenticated || state is AuthError;
+    final isAuthenticated =
+        state is AuthAuthenticated || state is AuthUserInfoLoaded;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -223,7 +310,7 @@ class AuthStatusPage extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        if (state is AuthAuthenticated) ...[
+        if (isAuthenticated) ...[
           ElevatedButton.icon(
             onPressed: isLoading
                 ? null

@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 
 class UserInfoEntity extends Equatable {
   const UserInfoEntity({
-    required this.email,
+    this.email,
     this.firstName,
     this.lastName,
   });
 
-  final String email;
+  final String? email;
   final String? firstName;
   final String? lastName;
 
@@ -19,10 +19,10 @@ class UserInfoEntity extends Equatable {
     if (lastName != null && lastName!.isNotEmpty) {
       parts.add(lastName!);
     }
-    return parts.isEmpty ? email : parts.join(' ');
+    return parts.isEmpty ? (email ?? 'Client Credentials User') : parts.join(' ');
   }
 
-  String get displayName => fullName.isNotEmpty ? fullName : email;
+  String get displayName => fullName.isNotEmpty ? fullName : (email ?? 'Client Credentials User');
 
   @override
   List<Object?> get props => [email, firstName, lastName];

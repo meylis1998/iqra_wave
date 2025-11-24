@@ -8,7 +8,7 @@ part 'user_info_model.g.dart';
 @freezed
 abstract class UserInfoModel with _$UserInfoModel {
   const factory UserInfoModel({
-    required String email,
+    String? email,
     @JsonKey(name: 'first_name') String? firstName,
     @JsonKey(name: 'last_name') String? lastName,
   }) = _UserInfoModel;
@@ -34,6 +34,6 @@ abstract class UserInfoModel with _$UserInfoModel {
     if (lastName != null && lastName!.isNotEmpty) {
       parts.add(lastName!);
     }
-    return parts.isEmpty ? email : parts.join(' ');
+    return parts.isEmpty ? (email ?? 'Unknown') : parts.join(' ');
   }
 }
