@@ -12,7 +12,7 @@ class SecretsManager {
     }
 
     try {
-      final fileName = envFile ?? '.env';
+      final fileName = envFile ?? '.env.dev';
       await dotenv.load(fileName: fileName);
       _dotenvLoaded = true;
       _isInitialized = true;
@@ -88,8 +88,15 @@ class SecretsManager {
       return envUrl;
     }
 
-    return (_dotenvLoaded ? dotenv.env['OAUTH_BASE_URL'] : null) ??
-        'https://prelive-oauth2.quran.foundation';
+    final dotenvUrl = _dotenvLoaded ? dotenv.env['OAUTH_BASE_URL'] : null;
+    if (dotenvUrl != null && dotenvUrl.isNotEmpty) {
+      return dotenvUrl;
+    }
+
+    throw Exception(
+      'OAuth base URL not configured. '
+      'Please set OAUTH_BASE_URL in .env file or use --dart-define',
+    );
   }
 
   /// Get Quran API base URL
@@ -103,8 +110,15 @@ class SecretsManager {
       return envUrl;
     }
 
-    return (_dotenvLoaded ? dotenv.env['QURAN_API_BASE_URL'] : null) ??
-        'https://prelive-api.quran.foundation';
+    final dotenvUrl = _dotenvLoaded ? dotenv.env['QURAN_API_BASE_URL'] : null;
+    if (dotenvUrl != null && dotenvUrl.isNotEmpty) {
+      return dotenvUrl;
+    }
+
+    throw Exception(
+      'Quran API base URL not configured. '
+      'Please set QURAN_API_BASE_URL in .env file or use --dart-define',
+    );
   }
 
   /// Get environment name

@@ -28,6 +28,5 @@ class UserInfoEntity extends Equatable {
   List<Object?> get props => [email, firstName, lastName];
 
   @override
-  String toString() =>
-      'UserInfoEntity(email: $email, firstName: $firstName, lastName: $lastName)';
+  String toString() => 'UserInfoEntity(displayName: $displayName)';
 }

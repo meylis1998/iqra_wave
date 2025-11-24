@@ -34,14 +34,8 @@ class AppConfig {
   }
 
   static String get baseUrl {
-    switch (_environment) {
-      case Environment.dev:
-        return 'https://jsonplaceholder.typicode.com';
-      case Environment.staging:
-        return 'https://jsonplaceholder.typicode.com';
-      case Environment.prod:
-        return 'https://jsonplaceholder.typicode.com';
-    }
+    _ensureInitialized();
+    return _secretsManager!.getQuranApiBaseUrl();
   }
 
   static String get appName {

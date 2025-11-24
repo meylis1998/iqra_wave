@@ -1,14 +1,4 @@
 class ApiConstants {
-  // Quran.Foundation OAuth2 URLs
-  static const String devOAuthUrl = 'https://prelive-oauth2.quran.foundation';
-  static const String stagingOAuthUrl = 'https://prelive-oauth2.quran.foundation';
-  static const String prodOAuthUrl = 'https://oauth2.quran.foundation';
-
-  // Quran.Foundation API URLs
-  static const String devQuranApiUrl = 'https://apis-prelive.quran.foundation';
-  static const String stagingQuranApiUrl = 'https://apis-prelive.quran.foundation';
-  static const String prodQuranApiUrl = 'https://apis.quran.foundation';
-
   // OAuth2 endpoints
   static const String oauth2Token = '/oauth2/token';
   static const String oauth2Authorize = '/oauth2/auth';
