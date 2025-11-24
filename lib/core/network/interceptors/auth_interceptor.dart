@@ -27,8 +27,6 @@ class AuthInterceptor extends Interceptor {
       final isExpired = await _tokenService.isTokenExpired();
 
       if (isExpired) {
-        AppLogger.info('Token expired, refreshing...');
-
         final result = await _tokenRefreshManager.refreshToken();
 
         result.fold(
@@ -36,7 +34,7 @@ class AuthInterceptor extends Interceptor {
             AppLogger.error('Token refresh failed: ${failure.message}');
           },
           (token) {
-            AppLogger.info('Token refreshed successfully');
+            // Token refreshed successfully
           },
         );
       }
@@ -57,8 +55,6 @@ class AuthInterceptor extends Interceptor {
   ) async {
     if (err.response?.statusCode == 401) {
       try {
-        AppLogger.info('Received 401, attempting token refresh');
-
         final result = await _tokenRefreshManager.refreshToken();
 
         return await result.fold(
@@ -70,8 +66,6 @@ class AuthInterceptor extends Interceptor {
             return handler.next(err);
           },
           (token) async {
-            AppLogger.info('Token refreshed, retrying request');
-
             return await _retryRequest(err, handler, token.accessToken);
           },
         );
@@ -86,13 +80,11 @@ class AuthInterceptor extends Interceptor {
 
   bool _shouldSkipAuth(RequestOptions options) {
     if (options.path.contains(ApiConstants.oauth2Token)) {
-      AppLogger.debug('Skipping auth interceptor for OAuth endpoint');
       return true;
     }
 
     if (options.path.contains(ApiConstants.login) ||
         options.path.contains(ApiConstants.register)) {
-      AppLogger.debug('Skipping auth for login/register endpoint');
       return true;
     }
 
@@ -105,15 +97,12 @@ class AuthInterceptor extends Interceptor {
 
     if (token != null && token.isNotEmpty) {
       options.headers[ApiConstants.xAuthToken] = token;
-      AppLogger.debug('Added x-auth-token header');
     }
 
     if (clientId != null && clientId.isNotEmpty) {
       options.headers[ApiConstants.xClientId] = clientId;
-      AppLogger.debug('Added x-client-id header: $clientId');
     } else {
       options.headers[ApiConstants.xClientId] = AppConfig.oauthClientId;
-      AppLogger.debug('Added x-client-id header from config');
     }
   }
 
@@ -130,7 +119,6 @@ class AuthInterceptor extends Interceptor {
         clientId ?? AppConfig.oauthClientId;
 
     try {
-      AppLogger.debug('Retrying request to ${options.path}');
       final response = await Dio().fetch(options);
       return handler.resolve(response);
     } catch (e, stackTrace) {

@@ -35,11 +35,6 @@ void main() async {
 
       AppConfig.initialize(secretsManager);
 
-      AppLogger.info(
-        'Initializing ${AppConfig.appName} (${AppConfig.environment})',
-      );
-      AppLogger.debug('Configuration: ${secretsManager.getConfigDebugInfo()}');
-
       try {
         await Firebase.initializeApp();
 

@@ -18,8 +18,6 @@ class SecretsManager {
       await dotenv.load(fileName: fileName);
       _dotenvLoaded = true;
       _isInitialized = true;
-      AppLogger.info('SecretsManager initialized from $fileName');
-      AppLogger.debug('Loaded env keys: ${dotenv.env.keys.toList()}');
 
       if (dotenv.env.isEmpty) {
         AppLogger.warning('Warning: .env file loaded but contains no values');

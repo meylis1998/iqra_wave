@@ -20,20 +20,6 @@ class TokenService {
 
       final updatedToken = token.copyWith(issuedAt: issuedAt);
 
-      final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(
-        updatedToken.expiryTimestamp * 1000,
-      );
-      final now = DateTime.now();
-      final timeUntilExpiry = expiryDateTime.difference(now);
-
-      AppLogger.info(
-        'Token stored successfully:\n'
-        '  Issued at: ${DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000)}\n'
-        '  Expires at: $expiryDateTime\n'
-        '  Valid for: ${timeUntilExpiry.inMinutes} minutes (${timeUntilExpiry.inSeconds} seconds)\n'
-        '  Token length: ${updatedToken.accessToken.length} characters',
-      );
-
       await _secureStorage.write(
         key: StorageConstants.quranFoundationToken,
         value: updatedToken.accessToken,
@@ -89,29 +75,11 @@ class TokenService {
     try {
       final expiry = await getTokenExpiry();
       if (expiry == null) {
-        AppLogger.debug('No token expiry found - token is expired');
         return true;
       }
 
       final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
       final isExpired = now >= (expiry - _tokenBufferSeconds);
-
-      if (isExpired) {
-        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
-        final timeRemaining = expiry - now;
-
-        AppLogger.warning(
-          'Token is expired or expiring soon:\n'
-          '  Expires at: $expiryDateTime\n'
-          '  Time remaining: $timeRemaining seconds\n'
-          '  Buffer threshold: $_tokenBufferSeconds seconds',
-        );
-      } else {
-        final timeRemaining = expiry - now - _tokenBufferSeconds;
-        AppLogger.debug(
-          'Token is still valid. Time until refresh needed: $timeRemaining seconds',
-        );
-      }
 
       return isExpired;
     } catch (e) {
@@ -144,7 +112,6 @@ class TokenService {
     try {
       final expiry = await getTokenExpiry();
       if (expiry == null) {
-        AppLogger.debug('No token expiry - cannot calculate time remaining');
         return null;
       }
 
@@ -152,21 +119,8 @@ class TokenService {
       final remaining = expiry - now;
 
       if (remaining > 0) {
-        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
-        AppLogger.debug(
-          'Token time remaining:\n'
-          '  Expires at: $expiryDateTime\n'
-          '  Seconds remaining: $remaining\n'
-          '  Minutes remaining: ${(remaining / 60).toStringAsFixed(1)}',
-        );
         return remaining;
       } else {
-        final expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
-        AppLogger.warning(
-          'Token has already expired:\n'
-          '  Expired at: $expiryDateTime\n'
-          '  Expired ${remaining.abs()} seconds ago',
-        );
         return null;
       }
     } catch (e) {
