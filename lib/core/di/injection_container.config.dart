@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -40,56 +41,69 @@ import '../services/token_service.dart' as _i227;
 import '../theme/theme_cubit.dart' as _i611;
 
 extension GetItInjectableX on _i174.GetIt {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
   }) {
-    final gh = _i526.GetItHelper(
-      this,
-      environment,
-      environmentFilter,
-    );
+    final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i611.ThemeCubit>(() => _i611.ThemeCubit());
     gh.lazySingleton<_i1068.DeviceSecurityService>(
-        () => _i1068.DeviceSecurityService());
+      () => _i1068.DeviceSecurityService(),
+    );
     gh.lazySingleton<_i667.DioClient>(() => _i667.DioClient());
     gh.lazySingleton<_i374.BiometricService>(() => _i374.BiometricService());
     gh.lazySingleton<_i759.PerformanceMonitor>(
-        () => _i759.PerformanceMonitor());
+      () => _i759.PerformanceMonitor(),
+    );
     gh.lazySingleton<_i1050.ObservabilityService>(
-        () => _i1050.ObservabilityService());
+      () => _i1050.ObservabilityService(),
+    );
     gh.lazySingleton<_i627.PreferencesService>(
-        () => _i627.PreferencesService(gh<_i460.SharedPreferences>()));
+      () => _i627.PreferencesService(gh<_i460.SharedPreferences>()),
+    );
     gh.lazySingleton<_i227.TokenService>(
-        () => _i227.TokenService(gh<_i558.FlutterSecureStorage>()));
+      () => _i227.TokenService(gh<_i558.FlutterSecureStorage>()),
+    );
     gh.lazySingleton<_i107.AuthRemoteDataSource>(
-        () => _i107.AuthRemoteDataSourceImpl(gh<_i361.Dio>()));
-    gh.lazySingleton<_i787.AuthRepository>(() => _i153.AuthRepositoryImpl(
-          gh<_i107.AuthRemoteDataSource>(),
-          gh<_i227.TokenService>(),
-        ));
+      () => _i107.AuthRemoteDataSourceImpl(gh<_i361.Dio>()),
+    );
+    gh.lazySingleton<_i787.AuthRepository>(
+      () => _i153.AuthRepositoryImpl(
+        gh<_i107.AuthRemoteDataSource>(),
+        gh<_i227.TokenService>(),
+      ),
+    );
     gh.lazySingleton<_i932.NetworkInfo>(
-        () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()));
+      () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()),
+    );
     gh.lazySingleton<_i1020.GetAccessToken>(
-        () => _i1020.GetAccessToken(gh<_i787.AuthRepository>()));
+      () => _i1020.GetAccessToken(gh<_i787.AuthRepository>()),
+    );
     gh.lazySingleton<_i419.LogoutUser>(
-        () => _i419.LogoutUser(gh<_i787.AuthRepository>()));
+      () => _i419.LogoutUser(gh<_i787.AuthRepository>()),
+    );
     gh.lazySingleton<_i688.GetUserInfo>(
-        () => _i688.GetUserInfo(gh<_i787.AuthRepository>()));
+      () => _i688.GetUserInfo(gh<_i787.AuthRepository>()),
+    );
     gh.lazySingleton<_i209.RefreshToken>(
-        () => _i209.RefreshToken(gh<_i787.AuthRepository>()));
+      () => _i209.RefreshToken(gh<_i787.AuthRepository>()),
+    );
     gh.lazySingleton<_i557.ApiClient>(
-        () => _i557.ApiClient(gh<_i667.DioClient>()));
-    gh.factory<_i797.AuthBloc>(() => _i797.AuthBloc(
-          gh<_i1020.GetAccessToken>(),
-          gh<_i209.RefreshToken>(),
-          gh<_i688.GetUserInfo>(),
-          gh<_i419.LogoutUser>(),
-          gh<_i787.AuthRepository>(),
-        ));
+      () => _i557.ApiClient(gh<_i667.DioClient>()),
+    );
+    gh.factory<_i797.AuthBloc>(
+      () => _i797.AuthBloc(
+        gh<_i1020.GetAccessToken>(),
+        gh<_i209.RefreshToken>(),
+        gh<_i688.GetUserInfo>(),
+        gh<_i419.LogoutUser>(),
+        gh<_i787.AuthRepository>(),
+      ),
+    );
     gh.lazySingleton<_i251.TokenRefreshManager>(
-        () => _i251.TokenRefreshManager(gh<_i1020.GetAccessToken>()));
+      () => _i251.TokenRefreshManager(gh<_i1020.GetAccessToken>()),
+    );
     gh.lazySingleton<_i405.TokenRefreshScheduler>(
       () => _i405.TokenRefreshScheduler(
         gh<_i227.TokenService>(),

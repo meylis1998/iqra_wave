@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/constants/api_constants.dart';
 import 'package:iqra_wave/core/models/user_model.dart';
 import 'package:iqra_wave/core/network/dio_client.dart';
@@ -11,7 +12,8 @@ part 'api_client.g.dart';
 @RestApi()
 abstract class ApiClient {
   @factoryMethod
-  factory ApiClient(DioClient dioClient) => _ApiClient(dioClient.dio);
+  factory ApiClient(DioClient dioClient) =>
+      _ApiClient(dioClient.dio, baseUrl: AppConfig.quranApiBaseUrl);
 
   @GET(ApiConstants.users)
   Future<List<UserModel>> getUsers();

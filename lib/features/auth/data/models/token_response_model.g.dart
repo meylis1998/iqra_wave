@@ -7,21 +7,21 @@ part of 'token_response_model.dart';
 // **************************************************************************
 
 _$TokenResponseModelImpl _$$TokenResponseModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TokenResponseModelImpl(
-      accessToken: json['access_token'] as String,
-      tokenType: json['token_type'] as String,
-      expiresIn: (json['expires_in'] as num).toInt(),
-      scope: json['scope'] as String?,
-      issuedAt: (json['issuedAt'] as num?)?.toInt() ?? 0,
-    );
+  Map<String, dynamic> json,
+) => _$TokenResponseModelImpl(
+  accessToken: json['access_token'] as String,
+  tokenType: json['token_type'] as String,
+  expiresIn: (json['expires_in'] as num).toInt(),
+  scope: json['scope'] as String?,
+  issuedAt: (json['issuedAt'] as num?)?.toInt() ?? 0,
+);
 
 Map<String, dynamic> _$$TokenResponseModelImplToJson(
-        _$TokenResponseModelImpl instance) =>
-    <String, dynamic>{
-      'access_token': instance.accessToken,
-      'token_type': instance.tokenType,
-      'expires_in': instance.expiresIn,
-      'scope': instance.scope,
-      'issuedAt': instance.issuedAt,
-    };
+  _$TokenResponseModelImpl instance,
+) => <String, dynamic>{
+  'access_token': instance.accessToken,
+  'token_type': instance.tokenType,
+  'expires_in': instance.expiresIn,
+  'scope': instance.scope,
+  'issuedAt': instance.issuedAt,
+};

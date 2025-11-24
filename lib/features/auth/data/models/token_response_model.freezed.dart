@@ -12,7 +12,8 @@ part of 'token_response_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 TokenResponseModel _$TokenResponseModelFromJson(Map<String, dynamic> json) {
   return _TokenResponseModel.fromJson(json);
@@ -29,8 +30,12 @@ mixin _$TokenResponseModel {
   String? get scope => throw _privateConstructorUsedError;
   int get issuedAt => throw _privateConstructorUsedError;
 
+  /// Serializes this TokenResponseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of TokenResponseModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $TokenResponseModelCopyWith<TokenResponseModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -38,15 +43,17 @@ mixin _$TokenResponseModel {
 /// @nodoc
 abstract class $TokenResponseModelCopyWith<$Res> {
   factory $TokenResponseModelCopyWith(
-          TokenResponseModel value, $Res Function(TokenResponseModel) then) =
-      _$TokenResponseModelCopyWithImpl<$Res, TokenResponseModel>;
+    TokenResponseModel value,
+    $Res Function(TokenResponseModel) then,
+  ) = _$TokenResponseModelCopyWithImpl<$Res, TokenResponseModel>;
   @useResult
-  $Res call(
-      {@JsonKey(name: 'access_token') String accessToken,
-      @JsonKey(name: 'token_type') String tokenType,
-      @JsonKey(name: 'expires_in') int expiresIn,
-      String? scope,
-      int issuedAt});
+  $Res call({
+    @JsonKey(name: 'access_token') String accessToken,
+    @JsonKey(name: 'token_type') String tokenType,
+    @JsonKey(name: 'expires_in') int expiresIn,
+    String? scope,
+    int issuedAt,
+  });
 }
 
 /// @nodoc
@@ -59,6 +66,8 @@ class _$TokenResponseModelCopyWithImpl<$Res, $Val extends TokenResponseModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of TokenResponseModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -68,55 +77,63 @@ class _$TokenResponseModelCopyWithImpl<$Res, $Val extends TokenResponseModel>
     Object? scope = freezed,
     Object? issuedAt = null,
   }) {
-    return _then(_value.copyWith(
-      accessToken: null == accessToken
-          ? _value.accessToken
-          : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      tokenType: null == tokenType
-          ? _value.tokenType
-          : tokenType // ignore: cast_nullable_to_non_nullable
-              as String,
-      expiresIn: null == expiresIn
-          ? _value.expiresIn
-          : expiresIn // ignore: cast_nullable_to_non_nullable
-              as int,
-      scope: freezed == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as String?,
-      issuedAt: null == issuedAt
-          ? _value.issuedAt
-          : issuedAt // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            accessToken: null == accessToken
+                ? _value.accessToken
+                : accessToken // ignore: cast_nullable_to_non_nullable
+                      as String,
+            tokenType: null == tokenType
+                ? _value.tokenType
+                : tokenType // ignore: cast_nullable_to_non_nullable
+                      as String,
+            expiresIn: null == expiresIn
+                ? _value.expiresIn
+                : expiresIn // ignore: cast_nullable_to_non_nullable
+                      as int,
+            scope: freezed == scope
+                ? _value.scope
+                : scope // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            issuedAt: null == issuedAt
+                ? _value.issuedAt
+                : issuedAt // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
   }
 }
 
 /// @nodoc
 abstract class _$$TokenResponseModelImplCopyWith<$Res>
     implements $TokenResponseModelCopyWith<$Res> {
-  factory _$$TokenResponseModelImplCopyWith(_$TokenResponseModelImpl value,
-          $Res Function(_$TokenResponseModelImpl) then) =
-      __$$TokenResponseModelImplCopyWithImpl<$Res>;
+  factory _$$TokenResponseModelImplCopyWith(
+    _$TokenResponseModelImpl value,
+    $Res Function(_$TokenResponseModelImpl) then,
+  ) = __$$TokenResponseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {@JsonKey(name: 'access_token') String accessToken,
-      @JsonKey(name: 'token_type') String tokenType,
-      @JsonKey(name: 'expires_in') int expiresIn,
-      String? scope,
-      int issuedAt});
+  $Res call({
+    @JsonKey(name: 'access_token') String accessToken,
+    @JsonKey(name: 'token_type') String tokenType,
+    @JsonKey(name: 'expires_in') int expiresIn,
+    String? scope,
+    int issuedAt,
+  });
 }
 
 /// @nodoc
 class __$$TokenResponseModelImplCopyWithImpl<$Res>
     extends _$TokenResponseModelCopyWithImpl<$Res, _$TokenResponseModelImpl>
     implements _$$TokenResponseModelImplCopyWith<$Res> {
-  __$$TokenResponseModelImplCopyWithImpl(_$TokenResponseModelImpl _value,
-      $Res Function(_$TokenResponseModelImpl) _then)
-      : super(_value, _then);
+  __$$TokenResponseModelImplCopyWithImpl(
+    _$TokenResponseModelImpl _value,
+    $Res Function(_$TokenResponseModelImpl) _then,
+  ) : super(_value, _then);
 
+  /// Create a copy of TokenResponseModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -126,41 +143,43 @@ class __$$TokenResponseModelImplCopyWithImpl<$Res>
     Object? scope = freezed,
     Object? issuedAt = null,
   }) {
-    return _then(_$TokenResponseModelImpl(
-      accessToken: null == accessToken
-          ? _value.accessToken
-          : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      tokenType: null == tokenType
-          ? _value.tokenType
-          : tokenType // ignore: cast_nullable_to_non_nullable
-              as String,
-      expiresIn: null == expiresIn
-          ? _value.expiresIn
-          : expiresIn // ignore: cast_nullable_to_non_nullable
-              as int,
-      scope: freezed == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as String?,
-      issuedAt: null == issuedAt
-          ? _value.issuedAt
-          : issuedAt // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    return _then(
+      _$TokenResponseModelImpl(
+        accessToken: null == accessToken
+            ? _value.accessToken
+            : accessToken // ignore: cast_nullable_to_non_nullable
+                  as String,
+        tokenType: null == tokenType
+            ? _value.tokenType
+            : tokenType // ignore: cast_nullable_to_non_nullable
+                  as String,
+        expiresIn: null == expiresIn
+            ? _value.expiresIn
+            : expiresIn // ignore: cast_nullable_to_non_nullable
+                  as int,
+        scope: freezed == scope
+            ? _value.scope
+            : scope // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        issuedAt: null == issuedAt
+            ? _value.issuedAt
+            : issuedAt // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$TokenResponseModelImpl extends _TokenResponseModel {
-  const _$TokenResponseModelImpl(
-      {@JsonKey(name: 'access_token') required this.accessToken,
-      @JsonKey(name: 'token_type') required this.tokenType,
-      @JsonKey(name: 'expires_in') required this.expiresIn,
-      this.scope,
-      this.issuedAt = 0})
-      : super._();
+  const _$TokenResponseModelImpl({
+    @JsonKey(name: 'access_token') required this.accessToken,
+    @JsonKey(name: 'token_type') required this.tokenType,
+    @JsonKey(name: 'expires_in') required this.expiresIn,
+    this.scope,
+    this.issuedAt = 0,
+  }) : super._();
 
   factory _$TokenResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$TokenResponseModelImplFromJson(json);
@@ -201,33 +220,42 @@ class _$TokenResponseModelImpl extends _TokenResponseModel {
                 other.issuedAt == issuedAt));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, accessToken, tokenType, expiresIn, scope, issuedAt);
+    runtimeType,
+    accessToken,
+    tokenType,
+    expiresIn,
+    scope,
+    issuedAt,
+  );
 
-  @JsonKey(ignore: true)
+  /// Create a copy of TokenResponseModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$TokenResponseModelImplCopyWith<_$TokenResponseModelImpl> get copyWith =>
       __$$TokenResponseModelImplCopyWithImpl<_$TokenResponseModelImpl>(
-          this, _$identity);
+        this,
+        _$identity,
+      );
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TokenResponseModelImplToJson(
-      this,
-    );
+    return _$$TokenResponseModelImplToJson(this);
   }
 }
 
 abstract class _TokenResponseModel extends TokenResponseModel {
-  const factory _TokenResponseModel(
-      {@JsonKey(name: 'access_token') required final String accessToken,
-      @JsonKey(name: 'token_type') required final String tokenType,
-      @JsonKey(name: 'expires_in') required final int expiresIn,
-      final String? scope,
-      final int issuedAt}) = _$TokenResponseModelImpl;
+  const factory _TokenResponseModel({
+    @JsonKey(name: 'access_token') required final String accessToken,
+    @JsonKey(name: 'token_type') required final String tokenType,
+    @JsonKey(name: 'expires_in') required final int expiresIn,
+    final String? scope,
+    final int issuedAt,
+  }) = _$TokenResponseModelImpl;
   const _TokenResponseModel._() : super._();
 
   factory _TokenResponseModel.fromJson(Map<String, dynamic> json) =
@@ -246,8 +274,11 @@ abstract class _TokenResponseModel extends TokenResponseModel {
   String? get scope;
   @override
   int get issuedAt;
+
+  /// Create a copy of TokenResponseModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$TokenResponseModelImplCopyWith<_$TokenResponseModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

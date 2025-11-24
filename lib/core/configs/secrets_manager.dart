@@ -47,7 +47,9 @@ class SecretsManager {
       return envSecret;
     }
 
-    final dotenvSecret = _dotenvLoaded ? dotenv.env['OAUTH_CLIENT_SECRET'] : null;
+    final dotenvSecret = _dotenvLoaded
+        ? dotenv.env['OAUTH_CLIENT_SECRET']
+        : null;
     if (dotenvSecret != null && dotenvSecret.isNotEmpty) {
       AppLogger.debug('Using OAuth secret from .env file');
       return dotenvSecret;
@@ -59,7 +61,6 @@ class SecretsManager {
     );
   }
 
-  /// Get OAuth client ID
   String getOAuthClientId() {
     _ensureInitialized();
 
@@ -81,7 +82,6 @@ class SecretsManager {
     );
   }
 
-  /// Get OAuth base URL
   String getOAuthBaseUrl() {
     _ensureInitialized();
 
@@ -151,7 +151,9 @@ class SecretsManager {
       return enabled.toLowerCase() == 'true';
     }
 
-    final dotenvEnabled = _dotenvLoaded ? dotenv.env['ENABLE_CRASHLYTICS'] : null;
+    final dotenvEnabled = _dotenvLoaded
+        ? dotenv.env['ENABLE_CRASHLYTICS']
+        : null;
     return dotenvEnabled?.toLowerCase() == 'true';
   }
 

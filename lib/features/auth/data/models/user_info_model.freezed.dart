@@ -12,7 +12,8 @@ part of 'user_info_model.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
+  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
+);
 
 UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) {
   return _UserInfoModel.fromJson(json);
@@ -26,8 +27,12 @@ mixin _$UserInfoModel {
   @JsonKey(name: 'last_name')
   String? get lastName => throw _privateConstructorUsedError;
 
+  /// Serializes this UserInfoModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of UserInfoModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $UserInfoModelCopyWith<UserInfoModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -35,13 +40,15 @@ mixin _$UserInfoModel {
 /// @nodoc
 abstract class $UserInfoModelCopyWith<$Res> {
   factory $UserInfoModelCopyWith(
-          UserInfoModel value, $Res Function(UserInfoModel) then) =
-      _$UserInfoModelCopyWithImpl<$Res, UserInfoModel>;
+    UserInfoModel value,
+    $Res Function(UserInfoModel) then,
+  ) = _$UserInfoModelCopyWithImpl<$Res, UserInfoModel>;
   @useResult
-  $Res call(
-      {String email,
-      @JsonKey(name: 'first_name') String? firstName,
-      @JsonKey(name: 'last_name') String? lastName});
+  $Res call({
+    String email,
+    @JsonKey(name: 'first_name') String? firstName,
+    @JsonKey(name: 'last_name') String? lastName,
+  });
 }
 
 /// @nodoc
@@ -54,6 +61,8 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of UserInfoModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -61,20 +70,23 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
     Object? firstName = freezed,
     Object? lastName = freezed,
   }) {
-    return _then(_value.copyWith(
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String,
-      firstName: freezed == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastName: freezed == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+    return _then(
+      _value.copyWith(
+            email: null == email
+                ? _value.email
+                : email // ignore: cast_nullable_to_non_nullable
+                      as String,
+            firstName: freezed == firstName
+                ? _value.firstName
+                : firstName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            lastName: freezed == lastName
+                ? _value.lastName
+                : lastName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+          )
+          as $Val,
+    );
   }
 }
 
@@ -82,14 +94,16 @@ class _$UserInfoModelCopyWithImpl<$Res, $Val extends UserInfoModel>
 abstract class _$$UserInfoModelImplCopyWith<$Res>
     implements $UserInfoModelCopyWith<$Res> {
   factory _$$UserInfoModelImplCopyWith(
-          _$UserInfoModelImpl value, $Res Function(_$UserInfoModelImpl) then) =
-      __$$UserInfoModelImplCopyWithImpl<$Res>;
+    _$UserInfoModelImpl value,
+    $Res Function(_$UserInfoModelImpl) then,
+  ) = __$$UserInfoModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String email,
-      @JsonKey(name: 'first_name') String? firstName,
-      @JsonKey(name: 'last_name') String? lastName});
+  $Res call({
+    String email,
+    @JsonKey(name: 'first_name') String? firstName,
+    @JsonKey(name: 'last_name') String? lastName,
+  });
 }
 
 /// @nodoc
@@ -97,9 +111,12 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
     extends _$UserInfoModelCopyWithImpl<$Res, _$UserInfoModelImpl>
     implements _$$UserInfoModelImplCopyWith<$Res> {
   __$$UserInfoModelImplCopyWithImpl(
-      _$UserInfoModelImpl _value, $Res Function(_$UserInfoModelImpl) _then)
-      : super(_value, _then);
+    _$UserInfoModelImpl _value,
+    $Res Function(_$UserInfoModelImpl) _then,
+  ) : super(_value, _then);
 
+  /// Create a copy of UserInfoModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -107,31 +124,33 @@ class __$$UserInfoModelImplCopyWithImpl<$Res>
     Object? firstName = freezed,
     Object? lastName = freezed,
   }) {
-    return _then(_$UserInfoModelImpl(
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
-              as String,
-      firstName: freezed == firstName
-          ? _value.firstName
-          : firstName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      lastName: freezed == lastName
-          ? _value.lastName
-          : lastName // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    return _then(
+      _$UserInfoModelImpl(
+        email: null == email
+            ? _value.email
+            : email // ignore: cast_nullable_to_non_nullable
+                  as String,
+        firstName: freezed == firstName
+            ? _value.firstName
+            : firstName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        lastName: freezed == lastName
+            ? _value.lastName
+            : lastName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+      ),
+    );
   }
 }
 
 /// @nodoc
 @JsonSerializable()
 class _$UserInfoModelImpl extends _UserInfoModel {
-  const _$UserInfoModelImpl(
-      {required this.email,
-      @JsonKey(name: 'first_name') this.firstName,
-      @JsonKey(name: 'last_name') this.lastName})
-      : super._();
+  const _$UserInfoModelImpl({
+    required this.email,
+    @JsonKey(name: 'first_name') this.firstName,
+    @JsonKey(name: 'last_name') this.lastName,
+  }) : super._();
 
   factory _$UserInfoModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserInfoModelImplFromJson(json);
@@ -162,11 +181,13 @@ class _$UserInfoModelImpl extends _UserInfoModel {
                 other.lastName == lastName));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, email, firstName, lastName);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of UserInfoModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$UserInfoModelImplCopyWith<_$UserInfoModelImpl> get copyWith =>
@@ -174,18 +195,16 @@ class _$UserInfoModelImpl extends _UserInfoModel {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$UserInfoModelImplToJson(
-      this,
-    );
+    return _$$UserInfoModelImplToJson(this);
   }
 }
 
 abstract class _UserInfoModel extends UserInfoModel {
-  const factory _UserInfoModel(
-          {required final String email,
-          @JsonKey(name: 'first_name') final String? firstName,
-          @JsonKey(name: 'last_name') final String? lastName}) =
-      _$UserInfoModelImpl;
+  const factory _UserInfoModel({
+    required final String email,
+    @JsonKey(name: 'first_name') final String? firstName,
+    @JsonKey(name: 'last_name') final String? lastName,
+  }) = _$UserInfoModelImpl;
   const _UserInfoModel._() : super._();
 
   factory _UserInfoModel.fromJson(Map<String, dynamic> json) =
@@ -199,8 +218,11 @@ abstract class _UserInfoModel extends UserInfoModel {
   @override
   @JsonKey(name: 'last_name')
   String? get lastName;
+
+  /// Create a copy of UserInfoModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$UserInfoModelImplCopyWith<_$UserInfoModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -10,9 +10,9 @@ class ApiConstants {
   static const String prodOAuthUrl = 'https://oauth2.quran.foundation';
 
   // Quran.Foundation API URLs
-  static const String devQuranApiUrl = 'https://prelive-api.quran.foundation';
-  static const String stagingQuranApiUrl = 'https://prelive-api.quran.foundation';
-  static const String prodQuranApiUrl = 'https://api.quran.foundation';
+  static const String devQuranApiUrl = 'https://apis-prelive.quran.foundation';
+  static const String stagingQuranApiUrl = 'https://apis-prelive.quran.foundation';
+  static const String prodQuranApiUrl = 'https://apis.quran.foundation';
 
   // Legacy endpoints
   static const String posts = '/posts';
