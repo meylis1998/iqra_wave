@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:iqra_wave/core/configs/app_config.dart';
 import 'package:iqra_wave/core/configs/secrets_manager.dart';
@@ -18,7 +17,6 @@ import 'package:iqra_wave/features/auth/presentation/bloc/auth_event.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   await runZonedGuarded(
@@ -36,11 +34,7 @@ Future<void> main() async {
         ),
       );
 
-      final sharedPreferences = await SharedPreferences.getInstance();
-      getIt
-        ..registerLazySingleton(() => sharedPreferences)
-        ..registerLazySingleton(() => const FlutterSecureStorage())
-        ..registerLazySingleton(() => secretsManager);
+      getIt.registerLazySingleton(() => secretsManager);
 
       await configureDependencies();
 

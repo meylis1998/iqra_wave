@@ -3,16 +3,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:iqra_wave/core/di/injection_container.config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
 
 @InjectableInit(preferRelativeImports: true)
 Future<void> configureDependencies() async => getIt.init();
 
-/// Module for registering external dependencies
 @module
 abstract class ExternalDependenciesModule {
   @lazySingleton
