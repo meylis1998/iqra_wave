@@ -26,7 +26,6 @@ import '../../features/auth/domain/usecases/get_user_info.dart' as _i688;
 import '../../features/auth/domain/usecases/logout_user.dart' as _i419;
 import '../../features/auth/domain/usecases/refresh_token.dart' as _i209;
 import '../../features/auth/presentation/bloc/auth_bloc.dart' as _i797;
-import '../configs/secrets_manager.dart' as _i905;
 import '../network/api_client.dart' as _i557;
 import '../network/dio_client.dart' as _i667;
 import '../network/network_info.dart' as _i932;
@@ -55,7 +54,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1068.DeviceSecurityService>(
         () => _i1068.DeviceSecurityService());
     gh.lazySingleton<_i667.DioClient>(() => _i667.DioClient());
-    gh.lazySingleton<_i905.SecretsManager>(() => _i905.SecretsManager());
     gh.lazySingleton<_i374.BiometricService>(() => _i374.BiometricService());
     gh.lazySingleton<_i759.PerformanceMonitor>(
         () => _i759.PerformanceMonitor());
