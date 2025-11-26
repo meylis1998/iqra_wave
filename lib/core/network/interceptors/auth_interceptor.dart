@@ -8,8 +8,8 @@ import 'package:iqra_wave/core/utils/logger.dart';
 
 class AuthInterceptor extends Interceptor {
   AuthInterceptor()
-      : _tokenService = getIt<TokenService>(),
-        _tokenRefreshManager = getIt<TokenRefreshManager>();
+    : _tokenService = getIt<TokenService>(),
+      _tokenRefreshManager = getIt<TokenRefreshManager>();
 
   final TokenService _tokenService;
   final TokenRefreshManager _tokenRefreshManager;
@@ -66,7 +66,7 @@ class AuthInterceptor extends Interceptor {
             return handler.next(err);
           },
           (token) async {
-            return await _retryRequest(err, handler, token.accessToken);
+            return _retryRequest(err, handler, token.accessToken);
           },
         );
       } catch (e, stackTrace) {

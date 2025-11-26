@@ -1,8 +1,26 @@
 {
-  "terminal.integrated.env.osx": {
-    "PATH": "/Users/meylisannagurbanov/.local/share/gem/ruby/3.4.0/bin:${env:PATH}"
-  },
-  "dart.env": {
-    "PATH": "/Users/meylisannagurbanov/.local/share/gem/ruby/3.4.0/bin:/Library/Development/flutter/bin:${env:PATH}"
-  }
+    "dart.lineLength": 80,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [80],
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+        "**/.dart_tool": true,
+        "**/.git": true,
+        "**/.gradle": true,
+        "**/.idea": true,
+        "**/.pub": true,
+        "**/ios/.symlinks": true,
+        "**/test/.test_coverage": true
+    },
+    "search.exclude": {
+        "**/.dart_tool": true,
+        "**/.git": true,
+        "**/.gradle": true,
+        "**/.pub": true,
+        "**/ios/.symlinks": true,
+        "**/test/.test_coverage": true
+    },
+    "terminal.integrated.cwd": "${workspaceFolder}"
 }
