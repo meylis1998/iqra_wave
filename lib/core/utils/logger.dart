@@ -6,8 +6,11 @@ class AppLogger {
 
   static Logger get logger {
     _logger ??= Logger(
-      printer: SimplePrinter(),
-      level: AppConfig.enableLogging ? Level.warning : Level.off,
+      printer: SimplePrinter(
+        printTime: false,
+        colors: true,
+      ),
+      level: AppConfig.enableLogging ? Level.warning : Level.nothing,
     );
     return _logger!;
   }

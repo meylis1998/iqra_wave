@@ -84,6 +84,8 @@ class MyApp extends StatelessWidget {
           create: (context) {
             final bloc = getIt<AuthBloc>();
 
+            AppRouter.initialize(bloc);
+
             bloc.stream.listen((state) {
               if (state is AuthAuthenticated) {
                 getIt<TokenRefreshScheduler>().startProactiveRefresh();

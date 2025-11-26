@@ -9,6 +9,9 @@ import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
 import 'package:iqra_wave/features/auth/domain/usecases/get_access_token.dart';
 import 'package:synchronized/synchronized.dart';
 
+/// Manages token refresh with proper queuing to prevent race conditions
+/// Ensures only one refresh operation happens at a time
+/// Multiple simultaneous requests wait for the same refresh to complete
 @lazySingleton
 class TokenRefreshManager {
   TokenRefreshManager(this._getAccessToken);
@@ -16,19 +19,24 @@ class TokenRefreshManager {
   final GetAccessToken _getAccessToken;
   final _lock = Lock();
 
+  // Queue of completers waiting for token refresh
   final List<Completer<TokenEntity>> _refreshQueue = [];
 
+  // Cached refresh future to prevent multiple simultaneous refreshes
   Future<Either<Failure, TokenEntity>>? _refreshFuture;
 
+  // Track last refresh time to prevent excessive refresh attempts
   DateTime? _lastRefreshAttempt;
   static const _minRefreshInterval = Duration(seconds: 5);
 
+  /// Thread-safe token refresh with request queuing
+  /// Returns Either<Failure, TokenEntity>
   Future<Either<Failure, TokenEntity>> refreshToken() async {
-    return _lock.synchronized(() async {
+    return await _lock.synchronized(() async {
+      // Check if we're refreshing too frequently
       if (_lastRefreshAttempt != null) {
-        final timeSinceLastRefresh = DateTime.now().difference(
-          _lastRefreshAttempt!,
-        );
+        final timeSinceLastRefresh =
+            DateTime.now().difference(_lastRefreshAttempt!);
 
         if (timeSinceLastRefresh < _minRefreshInterval) {
           AppLogger.warning(
@@ -47,7 +55,7 @@ class TokenRefreshManager {
           'Token refresh already in progress. '
           'Waiting for existing refresh to complete...',
         );
-        return _refreshFuture!;
+        return await _refreshFuture!;
       }
 
       // Start new refresh
@@ -105,8 +113,8 @@ class TokenRefreshManager {
     for (final completer in _refreshQueue) {
       if (!completer.isCompleted) {
         result.fold(
-          completer.completeError,
-          completer.complete,
+          (failure) => completer.completeError(failure),
+          (token) => completer.complete(token),
         );
       }
     }
