@@ -10,7 +10,7 @@ class AppLogger {
         printTime: false,
         colors: true,
       ),
-      level: AppConfig.enableLogging ? Level.warning : Level.nothing,
+      level: AppConfig.enableLogging ? Level.debug : Level.nothing,
     );
     return _logger!;
   }

@@ -33,8 +33,8 @@ class HomePage extends StatelessWidget {
                   tooltip: state is AuthAuthenticated
                       ? 'Authenticated'
                       : 'Not Authenticated',
-                  onPressed: () {
-                    context.push(RouteNames.authStatus);
+                  onPressed: () async {
+                    await context.push(RouteNames.authStatus);
                   },
                 );
               },

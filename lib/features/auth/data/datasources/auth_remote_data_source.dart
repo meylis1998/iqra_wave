@@ -116,6 +116,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<UserInfoModel> getUserInfo(String accessToken) async {
     try {
+      AppLogger.info('Getting user info with access token: ${accessToken.substring(0, 20)}...');
+      AppLogger.info('OAuth Base URL: ${AppConfig.oauthBaseUrl}');
+      AppLogger.info('Userinfo endpoint: ${ApiConstants.oauth2Userinfo}');
+
       final oauthDio = Dio(
         BaseOptions(
           baseUrl: AppConfig.oauthBaseUrl,
@@ -128,23 +132,38 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
 
+      AppLogger.info('Making request to: ${AppConfig.oauthBaseUrl}${ApiConstants.oauth2Userinfo}');
+
       final response = await oauthDio.get<Map<String, dynamic>>(
         ApiConstants.oauth2Userinfo,
       );
 
       AppLogger.info('UserInfo Response Status: ${response.statusCode}');
       AppLogger.info('UserInfo Response Data: ${response.data}');
+      AppLogger.info('UserInfo Response Headers: ${response.headers}');
+      AppLogger.info('UserInfo Full Response: ${response.toString()}');
 
       if (response.statusCode == 200 && response.data != null) {
-        return UserInfoModel.fromJson(response.data!);
+        AppLogger.info('Parsing UserInfo from JSON: ${response.data}');
+        final userInfo = UserInfoModel.fromJson(response.data!);
+        AppLogger.info('Parsed UserInfo: email=${userInfo.email}, firstName=${userInfo.firstName}, lastName=${userInfo.lastName}');
+        return userInfo;
       } else {
+        AppLogger.error('Failed to get user info - Status: ${response.statusCode}, Data: ${response.data}');
         throw OAuth2Exception(
           'Failed to get user info: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
+      AppLogger.error('DioException in getUserInfo: ${e.toString()}');
+      AppLogger.error('DioException type: ${e.type}');
+      AppLogger.error('DioException message: ${e.message}');
+
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
+        AppLogger.error('Error Response Status: $statusCode');
+        AppLogger.error('Error Response Data: ${e.response!.data}');
+        AppLogger.error('Error Response Headers: ${e.response!.headers}');
 
         switch (statusCode) {
           case 401:
@@ -169,11 +188,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             );
         }
       } else {
+        AppLogger.error('Network error - no response received');
         throw NetworkException(
           'Network error: ${e.message}',
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      AppLogger.error('Unexpected error in getUserInfo: $e');
+      AppLogger.error('Stack trace: $stackTrace');
       throw OAuth2Exception('Unexpected error: $e');
     }
   }

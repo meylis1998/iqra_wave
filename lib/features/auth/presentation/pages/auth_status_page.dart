@@ -218,8 +218,7 @@ class AuthStatusPage extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 8),
             _buildInfoRow('Display Name', userInfo.displayName),
-            if (userInfo.email != null)
-              _buildInfoRow('Email', userInfo.email!),
+            if (userInfo.email != null) _buildInfoRow('Email', userInfo.email!),
             if (userInfo.firstName != null)
               _buildInfoRow('First Name', userInfo.firstName!),
             if (userInfo.lastName != null)
@@ -282,7 +281,8 @@ class AuthStatusPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, AuthState state) {
-    final isLoading = state is AuthLoading ||
+    final isLoading =
+        state is AuthLoading ||
         state is AuthRefreshing ||
         state is AuthUserInfoLoading;
     final isUnauthenticated =

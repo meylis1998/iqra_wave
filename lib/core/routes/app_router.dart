@@ -9,6 +9,7 @@ import 'package:iqra_wave/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:iqra_wave/features/auth/presentation/bloc/auth_state.dart';
 import 'package:iqra_wave/features/auth/presentation/pages/auth_status_page.dart';
 import 'package:iqra_wave/features/auth/presentation/pages/login_page.dart';
+import 'package:iqra_wave/features/auth/presentation/pages/profile_page.dart';
 import 'package:iqra_wave/features/home/presentation/pages/home_page.dart';
 import 'package:iqra_wave/features/splash/presentation/pages/splash_page.dart';
 
@@ -76,6 +77,12 @@ class AppRouter {
         name: RouteNames.authStatus,
         pageBuilder: (context, state) =>
             MaterialPage(key: state.pageKey, child: const AuthStatusPage()),
+      ),
+      GoRoute(
+        path: RouteNames.profile,
+        name: RouteNames.profile,
+        pageBuilder: (context, state) =>
+            MaterialPage(key: state.pageKey, child: const ProfilePage()),
       ),
     ],
     errorBuilder: (context, state) =>

@@ -4,6 +4,7 @@ import 'package:iqra_wave/core/error/exceptions.dart';
 import 'package:iqra_wave/core/error/failures.dart';
 import 'package:iqra_wave/core/services/token_service.dart';
 import 'package:iqra_wave/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:iqra_wave/features/auth/data/datasources/oauth_authorization_code_data_source.dart';
 import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
 import 'package:iqra_wave/features/auth/domain/entities/user_info_entity.dart';
 import 'package:iqra_wave/features/auth/domain/repositories/auth_repository.dart';
@@ -12,10 +13,12 @@ import 'package:iqra_wave/features/auth/domain/repositories/auth_repository.dart
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(
     this._remoteDataSource,
+    this._oauthDataSource,
     this._tokenService,
   );
 
   final AuthRemoteDataSource _remoteDataSource;
+  final OAuthAuthorizationCodeDataSource _oauthDataSource;
   final TokenService _tokenService;
 
   @override
@@ -139,6 +142,85 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       await clearAuthData();
       return Left(UnexpectedFailure('Logout error: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TokenEntity>> signInWithBrowser() async {
+    try {
+      final tokenModel = await _oauthDataSource.signInWithBrowser();
+
+      await _tokenService.storeToken(tokenModel);
+
+      final entity = TokenEntity(
+        accessToken: tokenModel.accessToken,
+        tokenType: tokenModel.tokenType,
+        expiresIn: tokenModel.expiresIn,
+        issuedAt: tokenModel.issuedAt,
+      );
+
+      return Right(entity);
+    } on OAuth2Exception catch (e) {
+      return Left(OAuth2Failure(e.message));
+    } on AuthenticationException catch (e) {
+      return Left(AuthenticationFailure(e.message));
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure('Failed to sign in with browser: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TokenEntity>> refreshUserToken(
+    String refreshToken,
+  ) async {
+    try {
+      final tokenModel = await _oauthDataSource.refreshToken(refreshToken);
+
+      await _tokenService.storeToken(tokenModel);
+
+      final entity = TokenEntity(
+        accessToken: tokenModel.accessToken,
+        tokenType: tokenModel.tokenType,
+        expiresIn: tokenModel.expiresIn,
+        issuedAt: tokenModel.issuedAt,
+      );
+
+      return Right(entity);
+    } on OAuth2Exception catch (e) {
+      return Left(OAuth2Failure(e.message));
+    } on AuthenticationException catch (e) {
+      return Left(AuthenticationFailure(e.message));
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnexpectedFailure('Failed to refresh user token: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> signOut({String? idToken}) async {
+    try {
+      await _oauthDataSource.signOut(idToken: idToken);
+
+      await clearAuthData();
+
+      return const Right(unit);
+    } on NetworkException catch (e) {
+      await clearAuthData();
+      return Left(NetworkFailure(e.message));
+    } catch (e) {
+      await clearAuthData();
+      return Left(UnexpectedFailure('Sign out error: $e'));
     }
   }
 }

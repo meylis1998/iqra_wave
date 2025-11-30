@@ -350,6 +350,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_appauth:
+    dependency: "direct main"
+    description:
+      name: flutter_appauth
+      sha256: aba94ecd7aa542240c54c6bb0a875a577c73e9460c199dc74fe58e89e7a98a1a
+      url: "https://pub.dev"
+    source: hosted
+    version: "11.0.0"
+  flutter_appauth_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_appauth_platform_interface
+      sha256: "6c3c2f3a0060a2bf34880ca75b997b675f148275659c6abe2ff15d0819861259"
+      url: "https://pub.dev"
+    source: hosted
+    version: "11.0.0"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -573,6 +589,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  hugeicons_pro:
+    dependency: "direct main"
+    description:
+      name: hugeicons_pro
+      sha256: "45ad993949cecc4745535e33f04a13d16004058d3295b5e0b34d6b6d6a00ef9a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   hydrated_bloc:
     dependency: "direct main"
     description:

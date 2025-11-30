@@ -11,16 +11,16 @@ configurations.all {
 
 android {
     namespace = "com.example.iqra_wave"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     defaultConfig {
@@ -32,6 +32,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // OAuth2 redirect scheme for flutter_appauth
+        manifestPlaceholders["appAuthRedirectScheme"] = "iqrawave"
     }
 
     buildTypes {

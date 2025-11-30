@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:iqra_wave/features/auth/domain/entities/auth_mode.dart';
 import 'package:iqra_wave/features/auth/domain/entities/token_entity.dart';
 import 'package:iqra_wave/features/auth/domain/entities/user_info_entity.dart';
 
@@ -18,12 +19,13 @@ class AuthLoading extends AuthState {
 }
 
 class AuthAuthenticated extends AuthState {
-  const AuthAuthenticated(this.token);
+  const AuthAuthenticated(this.token, {this.authMode = AuthMode.clientCredentials});
 
   final TokenEntity token;
+  final AuthMode authMode;
 
   @override
-  List<Object?> get props => [token];
+  List<Object?> get props => [token, authMode];
 }
 
 class AuthUnauthenticated extends AuthState {
@@ -60,4 +62,23 @@ class AuthUserInfoLoaded extends AuthState {
 
 class AuthUserInfoLoading extends AuthState {
   const AuthUserInfoLoading();
+}
+
+// User Authentication States (Authorization Code + PKCE)
+
+class AuthSigningInWithBrowser extends AuthState {
+  const AuthSigningInWithBrowser();
+}
+
+class AuthUserAuthenticated extends AuthState {
+  const AuthUserAuthenticated({
+    required this.token,
+    required this.userInfo,
+  });
+
+  final TokenEntity token;
+  final UserInfoEntity userInfo;
+
+  @override
+  List<Object?> get props => [token, userInfo];
 }

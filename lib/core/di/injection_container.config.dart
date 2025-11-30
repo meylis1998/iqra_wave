@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
+import 'package:flutter_appauth/flutter_appauth.dart' as _i337;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -19,6 +20,8 @@ import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 import '../../features/auth/data/datasources/auth_remote_data_source.dart'
     as _i107;
+import '../../features/auth/data/datasources/oauth_authorization_code_data_source.dart'
+    as _i617;
 import '../../features/auth/data/repositories/auth_repository_impl.dart'
     as _i153;
 import '../../features/auth/domain/repositories/auth_repository.dart' as _i787;
@@ -26,6 +29,9 @@ import '../../features/auth/domain/usecases/get_access_token.dart' as _i1020;
 import '../../features/auth/domain/usecases/get_user_info.dart' as _i688;
 import '../../features/auth/domain/usecases/logout_user.dart' as _i419;
 import '../../features/auth/domain/usecases/refresh_token.dart' as _i209;
+import '../../features/auth/domain/usecases/refresh_user_token.dart' as _i245;
+import '../../features/auth/domain/usecases/sign_in_with_browser.dart' as _i9;
+import '../../features/auth/domain/usecases/sign_out_user.dart' as _i474;
 import '../../features/auth/presentation/bloc/auth_bloc.dart' as _i797;
 import '../network/api_client.dart' as _i557;
 import '../network/dio_client.dart' as _i667;
@@ -55,6 +61,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => externalDependenciesModule.secureStorage,
     );
+    gh.lazySingleton<_i337.FlutterAppAuth>(
+      () => externalDependenciesModule.appAuth,
+    );
     await gh.lazySingletonAsync<_i460.SharedPreferences>(
       () => externalDependenciesModule.sharedPreferences,
       preResolve: true,
@@ -67,20 +76,27 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i627.PreferencesService>(
       () => _i627.PreferencesService(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i617.OAuthAuthorizationCodeDataSource>(
+      () => _i617.OAuthAuthorizationCodeDataSource(gh<_i337.FlutterAppAuth>()),
+    );
     gh.lazySingleton<_i227.TokenService>(
       () => _i227.TokenService(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i107.AuthRemoteDataSource>(
       () => _i107.AuthRemoteDataSourceImpl(gh<_i361.Dio>()),
     );
+    gh.lazySingleton<_i932.NetworkInfo>(
+      () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()),
+    );
+    gh.lazySingleton<_i557.ApiClient>(
+      () => _i557.ApiClient(gh<_i667.DioClient>()),
+    );
     gh.lazySingleton<_i787.AuthRepository>(
       () => _i153.AuthRepositoryImpl(
         gh<_i107.AuthRemoteDataSource>(),
+        gh<_i617.OAuthAuthorizationCodeDataSource>(),
         gh<_i227.TokenService>(),
       ),
-    );
-    gh.lazySingleton<_i932.NetworkInfo>(
-      () => _i932.NetworkInfoImpl(gh<_i161.InternetConnection>()),
     );
     gh.lazySingleton<_i1020.GetAccessToken>(
       () => _i1020.GetAccessToken(gh<_i787.AuthRepository>()),
@@ -94,8 +110,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i209.RefreshToken>(
       () => _i209.RefreshToken(gh<_i787.AuthRepository>()),
     );
-    gh.lazySingleton<_i557.ApiClient>(
-      () => _i557.ApiClient(gh<_i667.DioClient>()),
+    gh.lazySingleton<_i245.RefreshUserToken>(
+      () => _i245.RefreshUserToken(gh<_i787.AuthRepository>()),
+    );
+    gh.lazySingleton<_i9.SignInWithBrowser>(
+      () => _i9.SignInWithBrowser(gh<_i787.AuthRepository>()),
+    );
+    gh.lazySingleton<_i474.SignOutUser>(
+      () => _i474.SignOutUser(gh<_i787.AuthRepository>()),
     );
     gh.factory<_i797.AuthBloc>(
       () => _i797.AuthBloc(
@@ -103,6 +125,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i209.RefreshToken>(),
         gh<_i688.GetUserInfo>(),
         gh<_i419.LogoutUser>(),
+        gh<_i9.SignInWithBrowser>(),
+        gh<_i474.SignOutUser>(),
+        gh<_i245.RefreshUserToken>(),
         gh<_i787.AuthRepository>(),
       ),
     );
